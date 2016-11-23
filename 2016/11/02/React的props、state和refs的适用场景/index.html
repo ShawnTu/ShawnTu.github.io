@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>props、state和refs三剑客的适用场合 | 酶窝</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/app.css">
+  <!-- <link rel='stylesheet' href='http://fonts.useso.com/css?family=Source+Code+Pro'> -->
+</head>
+
+<body>
+  <nav class="app-nav">
+  
+    
+      <a href="/.">home</a>
+    
+  
+    
+      <a href="/archives">archive</a>
+    
+  
+    
+      <a href="/atom.xml">rss</a>
+    
+  
+</nav>
+
+  <main class="post">
+  <article>
+  <h1 class="article-title">
+    <a href="/2016/11/02/React的props、state和refs的适用场景/">props、state和refs三剑客的适用场合</a>
+  </h1>
+
+  <section class="article-meta">
+    <p class="article-date">November 02 2016</p>
+  </section>
+
+  <section class="article-entry">
+    <h1 id="props、state和refs三剑客的适用场合"><a href="#props、state和refs三剑客的适用场合" class="headerlink" title="props、state和refs三剑客的适用场合"></a>props、state和refs三剑客的适用场合</h1><p><img src="/images/props state.jpg" alt="Alt text"></p>
+<h2 id="props和state的比较"><a href="#props和state的比较" class="headerlink" title="props和state的比较"></a>props和state的比较</h2><p>props是一种从父级向子级传递数据的方式<br>state仅用于实现交互功能，也就是说，数据随着时间变化</p>
+<h2 id="state的适用法则"><a href="#state的适用法则" class="headerlink" title="state的适用法则"></a>state的适用法则</h2><p>简单地对应用中的每一项数据提出三个问题：</p>
+<ol>
+<li>是否是从父级通过props传入的？如果是，可能不是state</li>
+<li>是否随着时间改变？如果不是，可能不是state</li>
+<li>能根据组件中其它state数据或者props计算出来吗？如果是，就不是state</li>
+</ol>
+<p>记住： React 中数据是沿着组件树从上到下单向流动的。可能不会立刻明白哪个组件应该拥有哪些 state 数据模型。这对新手通常是最难理解和最具挑战的，因此跟随以下步骤来弄清楚这点：</p>
+<p>对于应用中的每一个 state 数据：</p>
+<ul>
+<li>找出每一个基于那个 state 渲染界面的组件。</li>
+<li>找出共同的祖先组件（某个单个的组件，在组件树中位于需要这个 state 的所有组件的上面）。</li>
+<li>要么是共同的祖先组件，要么是另外一个在组件树中位于更高层级的组件应该拥有这个 state 。</li>
+<li>如果找不出拥有这个 state 数据模型的合适的组件，创建一个新的组件来维护这个 state ，然后添加到组件树中，层级位于所有共同拥有者组件的上面。</li>
+</ul>
+<h2 id="如何模拟双向数据绑定"><a href="#如何模拟双向数据绑定" class="headerlink" title="如何模拟双向数据绑定"></a>如何模拟双向数据绑定</h2><p>React 让<strong>单向数据流动</strong>非常明确，从而很容易理解应用是如何工作的，但是相对于传统的双向数据绑定，确实需要输入更多的东西。模拟双向数据绑定可以依靠下面的方式：</p>
+<ul>
+<li>回调函数</li>
+<li>ReactLink插件</li>
+</ul>
+<h2 id="refs的优点"><a href="#refs的优点" class="headerlink" title="refs的优点"></a>refs的优点</h2><p>React 支持一种非常特殊的属性，你可以用来绑定到 render() 输出的任何组件上去。这个特殊的属性允许你引用 render() 返回的相应的<strong>支撑实例</strong>（ backing instance ）。这样就可以确保在任何时间总是拿到正确的实例。</p>
+<p>优点：</p>
+<ul>
+<li>可以在组件类里面定义任何公共的方法（比如在输入之前的重置方法），然后通过 refs 来调用这些公共的方法（比如 <code>this.refs.myTypeahead.reset()</code>）。</li>
+<li>管理 DOM 几乎总是需要冲出“本地”组件的限制，比如通过 <code>this.refs.myInput.getDOMNode()</code> 获取 <code>&lt;input /&gt;</code> 元素的底层 DOM 节点。 Refs 是做这件事唯一可靠的方式。</li>
+<li>Refs 是被自动管理的！如果某个子级实例被销毁了，它的 ref 也会自动销毁。不用考虑内存问题（除非你自己做一些疯狂的操作，保存了什么引用）。</li>
+</ul>
+
+  </section>
+</article>
+
+  <div class="sharing grid">
+  <section class="profile grid-item grid">
+    <img class="avatar" src="/images/avatar.png" alt="avatar" />
+    <div class="grid-item">
+      <p class="title"> 酶窝 </p>
+      <p class="subtitle"> 酶窝 </p>
+    <div>
+  </section>
+
+  <section class="share-btns">
+    <!-- <p> share it if you like it~ </p> -->
+    <a
+  class="twitter-share-button"
+  data-size="large"
+  data-via="DrakeLeung"
+  href="https://twitter.com/intent/tweet?text= id="props、state和ref"
+>
+  Tweet
+</a>
+
+<script>
+  window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  js.async = true;
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+  </section>
+</div>
+
+
+  
+    
+<section class="article-comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+<script>
+  var disqus_shortname = 'drakeleung';
+  
+  var disqus_url = 'http://yoursite.com/2016/11/02/React的props、state和refs的适用场景/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+  
+</main>
+
+</body>
+</html>
