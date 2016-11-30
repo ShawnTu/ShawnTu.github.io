@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>组件的协同，啤酒配炸鸡 | 酶窝</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/app.css">
+  <!-- <link rel='stylesheet' href='http://fonts.useso.com/css?family=Source+Code+Pro'> -->
+</head>
+
+<body>
+  <nav class="app-nav">
+  
+    
+      <a href="/.">home</a>
+    
+  
+    
+      <a href="/archives">archive</a>
+    
+  
+    
+      <a href="/atom.xml">rss</a>
+    
+  
+</nav>
+
+  <main class="post">
+  <article>
+  <h1 class="article-title">
+    <a href="/2016/11/30/组件的协同，啤酒配炸鸡/">组件的协同，啤酒配炸鸡</a>
+  </h1>
+
+  <section class="article-meta">
+    <p class="article-date">November 30 2016</p>
+  </section>
+
+  <section class="article-entry">
+    <h1 id="组件的协同，啤酒配炸鸡"><a href="#组件的协同，啤酒配炸鸡" class="headerlink" title="组件的协同，啤酒配炸鸡"></a>组件的协同，啤酒配炸鸡</h1><h2 id="组件协同使用介绍"><a href="#组件协同使用介绍" class="headerlink" title="组件协同使用介绍"></a>组件协同使用介绍</h2><blockquote>
+<p>什么是组件协同使用</p>
+</blockquote>
+<p><img src="/images/QQ截图20161129213435.png" alt="Alt text"></p>
+<p>组件的协同本质上是对组件的一种<strong>组织、管理方式</strong>。<br>目的：</p>
+<ul>
+<li>逻辑清晰</li>
+<li>代码模块化</li>
+<li>封装细节</li>
+<li>代码可复用</li>
+</ul>
+<blockquote>
+<p>如何实现组件的协同使用</p>
+</blockquote>
+<p><img src="/images/QQ截图20161129213857.png" alt="Alt text"></p>
+<p><img src="/images/QQ截图20161129213643.png" alt="Alt text"></p>
+<h2 id="组件嵌套"><a href="#组件嵌套" class="headerlink" title="组件嵌套"></a>组件嵌套</h2><blockquote>
+<p>组件嵌套的含义</p>
+</blockquote>
+<p>组件嵌套的本质是<strong>父子关系</strong>。</p>
+<p><img src="/images/QQ截图20161129214000.png" alt="Alt text"></p>
+<blockquote>
+<p>组件嵌套的优点和缺点</p>
+</blockquote>
+<p>优点：</p>
+<ul>
+<li>逻辑清晰：父子关系和人类社会的父子关系对应，易于理解</li>
+<li>代码模块化：每个模块对应一个功能，不同的模块可以同步开发</li>
+<li>封装细节：开发者只需要关注组件的功能，不用关心组件的实现细节</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>编写难度高：父子关系的具体实现需要经过深思熟虑，贸然编写将导致关系混乱、代码难以维护</li>
+<li>无法掌握所有细节：使用者只知道组件用法，不知道实现细节，遇到问题难以修复</li>
+</ul>
+<blockquote>
+<p>实例演示</p>
+</blockquote>
+<p>1、典型父子关系的实现</p>
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">   <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/react.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/JSXTransformer.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/jsx"</span>&gt;</span><span class="xml"></span></div><div class="line">       var GenderSelect = React.createClass(&#123;</div><div class="line">           render: function() &#123;</div><div class="line">               return <span class="tag">&lt;<span class="name">select</span> <span class="attr">onChange</span>=<span class="string">&#123;this.props.handleSelect&#125;</span>&gt;</span></div><div class="line">               <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">"0"</span>&gt;</span>男<span class="tag">&lt;/<span class="name">option</span>&gt;</span></div><div class="line">               <span class="tag">&lt;<span class="name">option</span> <span class="attr">value</span>=<span class="string">"1"</span>&gt;</span>女<span class="tag">&lt;/<span class="name">option</span>&gt;</span></div><div class="line">               <span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line">           &#125;</div><div class="line">       &#125;)</div><div class="line">       var SignupForm = React.createClass(&#123;</div><div class="line">           getInitialState: function() &#123;</div><div class="line">               return &#123;</div><div class="line">                   name: '',</div><div class="line">                   password: '',</div><div class="line">                   gender: '',</div><div class="line">               &#125;</div><div class="line">           &#125;,</div><div class="line">           handleChange: function(name, event) &#123;</div><div class="line">               var newState = &#123;&#125;</div><div class="line">               newState[name] = event.target.value</div><div class="line">               this.setState(newState)</div><div class="line">           &#125;,</div><div class="line">           handleSelect: function(event) &#123;</div><div class="line">               this.setState(&#123;gender: event.target.value&#125;)</div><div class="line">           &#125;,</div><div class="line">           render: function() &#123;</div><div class="line">               console.log(this.state)</div><div class="line">               return <span class="tag">&lt;<span class="name">form</span>&gt;</span></div><div class="line">               <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"请输入用户名"</span> <span class="attr">onChange</span>=<span class="string">&#123;this.handleChange.bind(this,</span> '<span class="attr">name</span>')&#125; /&gt;</span></div><div class="line">               <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">placeholder</span>=<span class="string">"请输入密码"</span> <span class="attr">onChange</span>=<span class="string">&#123;this.handleChange.bind(this,</span> '<span class="attr">password</span>')&#125; /&gt;</span></div><div class="line">               <span class="tag">&lt;<span class="name">GenderSelect</span> <span class="attr">handleSelect</span>=<span class="string">&#123;this.handleSelect&#125;</span>&gt;</span><span class="tag">&lt;/<span class="name">GenderSelect</span>&gt;</span></div><div class="line">               <span class="tag">&lt;/<span class="name">form</span>&gt;</span></div><div class="line">           &#125;</div><div class="line">       &#125;)</div><div class="line">       React.render(<span class="tag">&lt;<span class="name">SignupForm</span>&gt;</span><span class="tag">&lt;/<span class="name">SignupForm</span>&gt;</span>, document.body);</div><div class="line">   <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
+</code></pre><h2 id="Mixin编写和使用"><a href="#Mixin编写和使用" class="headerlink" title="Mixin编写和使用"></a>Mixin编写和使用</h2><blockquote>
+<p>Mixin的含义</p>
+</blockquote>
+<p>Mixin = 一组方法<br>Mixin的目的是<strong>横向抽离</strong>出组件的相似代码<br>相似概念：面向切面编程（AOP）、插件</p>
+<p><img src="/images/Mixin的含义.png" alt="Alt text"></p>
+<blockquote>
+<p>Mixin的优点和缺点</p>
+</blockquote>
+<p>优点：</p>
+<ul>
+<li>代码复用：抽离出通用代码，减少开发成本，提高开发效率</li>
+<li>即插即用：可以直接使用许多现有的Mixin来编写自己的组件</li>
+<li>适应性强：改动一次代码，影响多个组件</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>编写难度高：Mixin可能被用在各种环境中，兼容多种环境就需要更多的逻辑和代码，通用的代价是提高复杂度</li>
+<li>降低代码可读性：组件的优势在于将逻辑和界面直接结合在一起，Mixin本质上会分散逻辑，理解起来难度更大</li>
+</ul>
+<blockquote>
+<p>实例演示</p>
+</blockquote>
+<p>2、编写一个Mixin</p>
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">   <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/react-with-addons.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/JSXTransformer.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/jsx"</span>&gt;</span><span class="xml"></span></div><div class="line">       // var BindingExample = React.createClass(&#123;</div><div class="line">       //     getInitialState: function() &#123;</div><div class="line">       //         return &#123;</div><div class="line">       //             text: ''</div><div class="line">       //         &#125;</div><div class="line">       //     &#125;,</div><div class="line">       //     handleChange: function(event) &#123;</div><div class="line">       //         this.setState(&#123;text: event.target.value&#125;)</div><div class="line">       //     &#125;,</div><div class="line">       //     render: function() &#123;</div><div class="line">       //         return <span class="tag">&lt;<span class="name">div</span>&gt;</span></div><div class="line">       //             <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"请输入内容"</span> <span class="attr">onChange</span>=<span class="string">&#123;this.handleChange&#125;</span> /&gt;</span></div><div class="line">       //             <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;this.state.text&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">       //         <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">       //     &#125;</div><div class="line">       // &#125;)</div><div class="line">       var BindingMixin = &#123;</div><div class="line">           handleChange: function(key) &#123;</div><div class="line">               var that = this</div><div class="line">               var newState = &#123;&#125;</div><div class="line">               return function(event) &#123;</div><div class="line">                   </div><div class="line">                   newState[key] = event.target.value</div><div class="line">                   that.setState(newState)</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       var BindingExample = React.createClass(&#123;</div><div class="line">           mixins: [React.addons.LinkedStateMixin],</div><div class="line">           getInitialState: function() &#123;</div><div class="line">               return &#123;</div><div class="line">                   text: '',</div><div class="line">                   comment: '',</div><div class="line">               &#125;</div><div class="line">           &#125;,</div><div class="line">           render: function() &#123;</div><div class="line">               return <span class="tag">&lt;<span class="name">div</span>&gt;</span></div><div class="line">                   <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">placeholder</span>=<span class="string">"请输入内容"</span> <span class="attr">valueLink</span>=<span class="string">&#123;this.linkState(</span>'<span class="attr">text</span>')&#125; /&gt;</span></div><div class="line">                   <span class="tag">&lt;<span class="name">textarea</span> <span class="attr">valueLink</span>=<span class="string">&#123;this.linkState(</span>'<span class="attr">comment</span>')&#125;&gt;</span><span class="tag">&lt;/<span class="name">textarea</span>&gt;</span></div><div class="line">                   <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;this.state.text&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">                   <span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;this.state.comment&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">               <span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">           &#125;</div><div class="line">       &#125;)</div><div class="line">       React.render(<span class="tag">&lt;<span class="name">BindingExample</span>&gt;</span><span class="tag">&lt;/<span class="name">BindingExample</span>&gt;</span>, document.body);</div><div class="line">   <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
+</code></pre><h2 id="React双向绑定Mixin源码阅读"><a href="#React双向绑定Mixin源码阅读" class="headerlink" title="React双向绑定Mixin源码阅读"></a>React双向绑定Mixin源码阅读</h2><blockquote>
+<p>阅读代码</p>
+</blockquote>
+<p>react-with-addons.js（插件相关）</p>
+
+  </section>
+</article>
+
+  <div class="sharing grid">
+  <section class="profile grid-item grid">
+    <img class="avatar" src="/images/avatar.png" alt="avatar" />
+    <div class="grid-item">
+      <p class="title"> 酶窝 </p>
+      <p class="subtitle"> 酶窝 </p>
+    <div>
+  </section>
+
+  <section class="share-btns">
+    <!-- <p> share it if you like it~ </p> -->
+    <a
+  class="twitter-share-button"
+  data-size="large"
+  data-via="DrakeLeung"
+  href="https://twitter.com/intent/tweet?text= id="组件的协同，啤酒配炸鸡"><a"
+>
+  Tweet
+</a>
+
+<script>
+  window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  js.async = true;
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+  </section>
+</div>
+
+
+  
+    
+<section class="article-comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+<script>
+  var disqus_shortname = 'drakeleung';
+  
+  var disqus_url = 'http://yoursite.com/2016/11/30/组件的协同，啤酒配炸鸡/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+  
+</main>
+
+</body>
+</html>
