@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>秘制组件性能调优 | 酶窝</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/app.css">
+  <!-- <link rel='stylesheet' href='http://fonts.useso.com/css?family=Source+Code+Pro'> -->
+</head>
+
+<body>
+  <nav class="app-nav">
+  
+    
+      <a href="/.">home</a>
+    
+  
+    
+      <a href="/archives">archive</a>
+    
+  
+    
+      <a href="/atom.xml">rss</a>
+    
+  
+</nav>
+
+  <main class="post">
+  <article>
+  <h1 class="article-title">
+    <a href="/2016/12/09/秘制组件性能调优/">秘制组件性能调优</a>
+  </h1>
+
+  <section class="article-meta">
+    <p class="article-date">December 09 2016</p>
+  </section>
+
+  <section class="article-entry">
+    <h1 id="秘制·组件性能调优"><a href="#秘制·组件性能调优" class="headerlink" title="秘制·组件性能调优"></a>秘制·组件性能调优</h1><h2 id="React性能调优原理"><a href="#React性能调优原理" class="headerlink" title="React性能调优原理"></a>React性能调优原理</h2><blockquote>
+<p>为什么需要调优</p>
+</blockquote>
+<p>React在开发的时候就非常注重性能，作为前端框架性能是极其重要的评判标准<br>React提高性能的方式：虚拟DOM，diff算法，将DOM操作减到最少<br>但是……</p>
+<ul>
+<li>父组件更新默认触发所有子组件更新</li>
+<li>列表类型的组件默认更新方式非常复杂</li>
+</ul>
+<blockquote>
+<p>调优的最佳时机</p>
+</blockquote>
+<p>避免“过早优化”<br>完成所有功能之后，如果发现性能问题再进行调优</p>
+<blockquote>
+<p>React调优原理</p>
+</blockquote>
+<p>性能问题：</p>
+<ul>
+<li>父组件更新默认触发所有子组件更新</li>
+<li>列表类型的组件默认更新方式非常复杂<br>解决方法</li>
+<li>子组件覆盖shouldComponentUpdate方法，自行决定是否更新</li>
+<li>给列表中的组件添加key属性</li>
+</ul>
+<p><img src="/images/QQ截图20161208205929.png" alt="Alt text"></p>
+<blockquote>
+<p>JS数据类型介绍</p>
+</blockquote>
+<p><img src="/images/QQ截图20161208210012.png" alt="Alt text"></p>
+<h2 id="如何寻找性能热点"><a href="#如何寻找性能热点" class="headerlink" title="如何寻找性能热点"></a>如何寻找性能热点</h2><blockquote>
+<p>React性能分析工具介绍</p>
+</blockquote>
+<p><img src="/images/QQ截图20161208210227.png" alt="Alt text"></p>
+<blockquote>
+<p>示例代码介绍</p>
+</blockquote>
+<p>存在性能问题的代码</p>
+<pre><code><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line">   <span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/react-with-addons.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./react-0.13.2/react-0.13.2/build/JSXTransformer.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/jsx"</span>&gt;</span><span class="undefined"></span></div><div class="line">       var NumberDiv = React.createClass(&#123;</div><div class="line">           getInitialState: function () &#123;</div><div class="line">               return &#123;</div><div class="line">                   number: this.props.number,</div><div class="line">               &#125;</div><div class="line">           &#125;,</div><div class="line">           shouldComponentUpdate: function (nextProps) &#123;</div><div class="line">               return nextProps.render</div><div class="line">           &#125;,</div><div class="line">           render: function () &#123;</div><div class="line">               var style = &#123;</div><div class="line">                   height: "100px",</div><div class="line">                   width: "100px",</div><div class="line">                   float: "left",</div><div class="line">                   margin: "10px",</div><div class="line">                   backgroundColor: "gray",</div><div class="line">               &#125;</div><div class="line">               var chosedStyle = &#123;</div><div class="line">                   height: "100px",</div><div class="line">                   width: "100px",</div><div class="line">                   float: "left",</div><div class="line">                   margin: "10px",</div><div class="line">                   backgroundColor: "red",</div><div class="line">               &#125;</div><div class="line">               return &lt;div style=&#123;this.props.chosedNumber === this.state.number ? chosedStyle : style&#125;&gt;</div><div class="line">                   &#123;this.state.number&#125;</div><div class="line">               &lt;/div&gt;</div><div class="line">           &#125;</div><div class="line">       &#125;)</div><div class="line">       var ChooseNumber = React.createClass(&#123; </div><div class="line">           getInitialState: function () &#123;</div><div class="line">               return &#123;</div><div class="line">                   inputNumber: -1,</div><div class="line">                   lastNumber: -1</div><div class="line">               &#125;</div><div class="line">           &#125;,</div><div class="line">           handleChange: function (e) &#123;</div><div class="line">               if (parseInt(e.target.value) !== this.state.inputNumber) &#123;</div><div class="line">                   this.setState(&#123;</div><div class="line">                       inputNumber: parseInt(e.target.value),</div><div class="line">                       lastNumber: this.state.inputNumber</div><div class="line">                   &#125;)</div><div class="line">               &#125;  </div><div class="line">           &#125;,</div><div class="line">           render: function () &#123;</div><div class="line">               var inputStyle = &#123;</div><div class="line">                   display: "block",</div><div class="line">                   clear: "both",</div><div class="line">                   width: "200px",</div><div class="line">                   marginBottom: "10px",</div><div class="line">               &#125;</div><div class="line">               var children = []</div><div class="line">               for (var i = 0; i &lt; 5000; i++) &#123;</div><div class="line">                   children.push(&lt;NumberDiv key=&#123;i&#125; render=&#123;i == this.state.inputNumber || i == this.state.lastNumber&#125; chosedNumber=&#123;this.state.inputNumber&#125; number=&#123;i&#125;&gt;&lt;/NumberDiv&gt;) </div><div class="line">               &#125;</div><div class="line">               return &lt;div&gt; </div><div class="line">                   &lt;input type="text" style=&#123;inputStyle&#125; placeholder="请输入一个数字" onChange=&#123;this.handleChange&#125; /&gt;</div><div class="line">                   &#123;children&#125;</div><div class="line">               &lt;/div&gt;;</div><div class="line">           &#125; </div><div class="line">       &#125;);</div><div class="line">       React.render(&lt;ChooseNumber&gt;&lt;/ChooseNumber&gt;, document.body);</div><div class="line">   <span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
+</code></pre><blockquote>
+<p>使用工具分析性能热点</p>
+</blockquote>
+<h2 id="如何解决性能问题"><a href="#如何解决性能问题" class="headerlink" title="如何解决性能问题"></a>如何解决性能问题</h2><blockquote>
+<p>PureRenderMixin介绍</p>
+</blockquote>
+<p>React官方提供的Mixin，用于“简单的”判断是否需要进入更新流程<br>本质上就是判断状态和属性是否改变</p>
+<p><img src="/images/1481202386603.png" alt="Alt text"></p>
+<p>PureRenderMixin源码</p>
+<p><img src="/images/1481202395313.png" alt="Alt text"></p>
+<p>直接对比存在的问题</p>
+<blockquote>
+<p>不可变插件介绍</p>
+</blockquote>
+<p>Immutability Helpers，实现JS不可变对象<br>修改不可变对象会返回一个新对象，之前的对象保持不变<br>不同对象在JS引擎中的引用不同，因此直接比较引用即可确定是否发生改变<br>基本语法：update(obj, cmd)</p>
+<p><img src="/images/QQ截图20161208210829.png" alt="Alt text"></p>
+<blockquote>
+<p>解决性能问题</p>
+</blockquote>
+
+  </section>
+</article>
+
+  <div class="sharing grid">
+  <section class="profile grid-item grid">
+    <img class="avatar" src="/images/avatar.png" alt="avatar" />
+    <div class="grid-item">
+      <p class="title"> 酶窝 </p>
+      <p class="subtitle"> 酶窝 </p>
+    <div>
+  </section>
+
+  <section class="share-btns">
+    <!-- <p> share it if you like it~ </p> -->
+    <a
+  class="twitter-share-button"
+  data-size="large"
+  data-via="DrakeLeung"
+  href="https://twitter.com/intent/tweet?text= id="秘制·组件性能调优"><a h"
+>
+  Tweet
+</a>
+
+<script>
+  window.twttr = (function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0],
+    t = window.twttr || {};
+  if (d.getElementById(id)) return t;
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "https://platform.twitter.com/widgets.js";
+  js.async = true;
+  fjs.parentNode.insertBefore(js, fjs);
+
+  t._e = [];
+  t.ready = function(f) {
+    t._e.push(f);
+  };
+
+  return t;
+}(document, "script", "twitter-wjs"));
+</script>
+
+  </section>
+</div>
+
+
+  
+    
+<section class="article-comment">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+<script>
+  var disqus_shortname = 'drakeleung';
+  
+  var disqus_url = 'http://yoursite.com/2016/12/09/秘制组件性能调优/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+  
+</main>
+
+</body>
+</html>
