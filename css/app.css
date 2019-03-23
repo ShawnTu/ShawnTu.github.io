@@ -240,13 +240,13 @@ main.post {
     text-transform: capitalize; }
 
 .code-block, .article-entry pre, .article-entry .highlight {
-  background: #2d2d2d;
+  background: #fff;
   margin: 1.6rem 0;
   padding: 3rem 1.8rem;
   border-style: solid;
   border-width: 1px 0;
   overflow: auto;
-  color: #ccc;
+  color: #000;
   line-height: 20px; }
 
 .line-numbers, .article-entry .highlight .gutter pre {
@@ -254,7 +254,7 @@ main.post {
   font-size: 0.9rem; }
 
 .article-entry pre, .article-entry code {
-  font-family: "Source Code Pro", Consolas, Monaco, Menlo, monospace; }
+  font-family: Menlo, Bitstream Vera Sans Mono, DejaVu Sans Mono, Monaco, Consolas, monospace; }
 
 .article-entry code {
   background: rgba(0, 0, 0, 0.07);
@@ -330,9 +330,17 @@ pre .xml .pi,
 pre .xml .doctype,
 pre .html .doctype,
 pre .css .id,
-pre .css .class,
 pre .css .pseudo {
-  color: #f2777a; }
+  color: #c82829; }
+
+pre .tag .attr {
+  color: #f5871f; }
+
+pre .tag .string {
+  color: #3e999f; }
+
+pre .template-tag {
+  color: #999; }
 
 pre .number,
 pre .preprocessor,
@@ -340,7 +348,7 @@ pre .built_in,
 pre .literal,
 pre .params,
 pre .constant {
-  color: #f99157; }
+  color: #f5871f; }
 
 pre .class,
 pre .ruby .class .title,
@@ -353,7 +361,7 @@ pre .inheritance,
 pre .header,
 pre .ruby .symbol,
 pre .xml .cdata {
-  color: #99cc99; }
+  color: #718c00; }
 
 pre .css .hexcolor {
   color: #66cccc; }
@@ -370,7 +378,7 @@ pre .coffeescript .title {
 
 pre .keyword,
 pre .javascript .function {
-  color: #cc99cc; }
+  color: #8959a8; }
 
 .back-to-home {
   position: absolute;
