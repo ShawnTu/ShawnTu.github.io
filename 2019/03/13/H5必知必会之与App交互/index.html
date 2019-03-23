@@ -52,17 +52,10 @@
 <p>移动端网页运行在手机应用内嵌的浏览器引擎中，这个没有UI的内核容器统称WebView，即iPhone的UIWebView（iOS 2.0–12.0）、WKWebView（iOS 8.0+，macOS 10.10+）和Android的WebView。总之，WebView就是在手机应用中运行和展示网页的界面和接口（神奇的是，英文Interface，既可以翻译成“界面”也可以翻译成“接口”）。</p>
 <p>H5与原生应用的交互都是通过原生应用中的WebView实现的。通过这个环境，H5可以调用原生应用注入其中的原生对象的方法，原生应用也可以调用H5暴露在这个环境中的JavaScript对象的方法，从而实现指令与数据的传输。</p>
 <p>比如，在Android应用中，WebView类有一个公有方法addJavascriptInterface，签名为：</p>
-<pre><code>public void addJavascriptInterface (Object object, String name)
-</code></pre><p>调用这个方法可以向WebView中以指定的名称name注入指定的Java对象object。这样，WebView中的JavaScript就可以通过name调用object的方法。比如：</p>
-<pre><code>class JsObject {
- @JavascriptInterface
- public String toString() { return &quot;injectedObject&quot;; }
- }
- webview.getSettings().setJavaScriptEnabled(true);
- webView.addJavascriptInterface(new JsObject(), &quot;injectedObject&quot;);
- webView.loadData(&quot;&quot;, &quot;text/html&quot;, null);
-webView.loadUrl(&quot;javascript:alert(injectedObject.toString())&quot;);
-</code></pre><p>在iOS或macOS中，需要通过创建WKWebView类的实例在应用中嵌入网页，交互过程类似。</p>
+<figure class="highlight delphi"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> void addJavascriptInterface (<span class="keyword">Object</span> <span class="keyword">object</span>, <span class="keyword">String</span> name)</div></pre></td></tr></table></figure>
+<p>调用这个方法可以向WebView中以指定的名称name注入指定的Java对象object。这样，WebView中的JavaScript就可以通过name调用object的方法。比如：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">class</span> <span class="selector-tag">JsObject</span> &#123;</div><div class="line">    <span class="variable">@JavascriptInterface</span></div><div class="line">    public String toString() &#123; return "injectedObject"; &#125;</div><div class="line">&#125;</div><div class="line">webview<span class="selector-class">.getSettings</span>()<span class="selector-class">.setJavaScriptEnabled</span>(true);</div><div class="line">webView<span class="selector-class">.addJavascriptInterface</span>(new JsObject(), <span class="string">"injectedObject"</span>);</div><div class="line">webView<span class="selector-class">.loadData</span>(<span class="string">""</span>, <span class="string">"text/html"</span>, null);</div><div class="line">webView<span class="selector-class">.loadUrl</span>(<span class="string">"javascript:alert(injectedObject.toString())"</span>);</div></pre></td></tr></table></figure>
+<p>在iOS或macOS中，需要通过创建WKWebView类的实例在应用中嵌入网页，交互过程类似。</p>
 <h2 id="基础接口"><a href="#基础接口" class="headerlink" title="基础接口"></a>基础接口</h2><p>所谓基础接口，就是首先要规定原生应用和JS分别在WebView里注入/暴露一个什么对象：</p>
 <ul>
 <li>NativeBridge：原生应用注入到WebView中的对象</li>
@@ -82,34 +75,11 @@ webView.loadUrl(&quot;javascript:alert(injectedObject.toString())&quot;);
 </ul>
 <p>基础接口只有两个对象和两个方法，JS与App间的互操作则通过action和params来扩展和定义。</p>
 <h2 id="实现模式"><a href="#实现模式" class="headerlink" title="实现模式"></a>实现模式</h2><p>对于JS而言，虽然这里只定义了一个对象一个方法，但实践中，可以把action对应方法的实现附加到JSBridge上，只要把callJS实现为一个分发方法即可，比如：</p>
-<pre><code>window.JSBridge = {}
-window.JSBridge.callJS = function({action, params, whoAmI}) {
- return window.JSBridge[action](params, whoAmI)
-}
-</code></pre><p>这样，所有对callJS的调用，都会转化成对JSBridge上相应action方法的调用，优点是只需一行代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">window</span>.JSBridge = &#123;&#125;</div><div class="line"><span class="built_in">window</span>.JSBridge.callJS = <span class="function"><span class="keyword">function</span>(<span class="params">&#123;action, params, whoAmI&#125;</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="built_in">window</span>.JSBridge[action](params, whoAmI)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样，所有对callJS的调用，都会转化成对JSBridge上相应action方法的调用，优点是只需一行代码。</p>
 <p>另一种实现方式是通过switch…case语句实现调用分发，比如:</p>
-<pre><code>function callJS (action, params, whoAmI) {
- params = JSON.parse(JSON.stringify(params))
- switch (action) {
- case &apos;showSkill&apos;:
- const category = params.category
- JSBridge.showSkill(category)
- break
- case &apos;showSkillDetail&apos;:
- const id = params.id
- JSBridge.showSkillDetail(id)
- break
- case &apos;otherAction&apos;:
- // some code
- break
- default:
- }
-}
-// JS暴露给应用的通用接口
-const SpkJSBridge = {}
-// 全部接口
-JSBridge.callJS = callJS
-</code></pre><p>这样实现的优点是所有方法一目了然，当然同样也是把所有相关接口都附加到同一个JSBridge对象上。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function">function <span class="title">callJS</span> (<span class="params">action, <span class="keyword">params</span>, whoAmI</span>) </span>&#123;</div><div class="line">    <span class="keyword">params</span> = JSON.parse(JSON.stringify(<span class="keyword">params</span>))</div><div class="line">    <span class="keyword">switch</span> (action) &#123;</div><div class="line">    <span class="keyword">case</span> <span class="string">'showSkill'</span>:</div><div class="line">    <span class="keyword">const</span> category = <span class="keyword">params</span>.category</div><div class="line">    JSBridge.showSkill(category)</div><div class="line">    <span class="keyword">break</span></div><div class="line">    <span class="keyword">case</span> <span class="string">'showSkillDetail'</span>:</div><div class="line">    <span class="keyword">const</span> id = <span class="keyword">params</span>.id</div><div class="line">    JSBridge.showSkillDetail(id)</div><div class="line">    <span class="keyword">break</span></div><div class="line">    <span class="keyword">case</span> <span class="string">'otherAction'</span>:</div><div class="line">    <span class="comment">// some code</span></div><div class="line">    <span class="keyword">break</span></div><div class="line">    <span class="keyword">default</span>:</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">// JS暴露给应用的通用接口</span></div><div class="line"><span class="keyword">const</span> SpkJSBridge = &#123;&#125;</div><div class="line"><span class="comment">// 全部接口</span></div><div class="line">JSBridge.callJS = callJS</div></pre></td></tr></table></figure>
+<p>这样实现的优点是所有方法一目了然，当然同样也是把所有相关接口都附加到同一个JSBridge对象上。</p>
 <p>以上两种实现模式各有利弊。</p>
 <h2 id="单向调用"><a href="#单向调用" class="headerlink" title="单向调用"></a>单向调用</h2><p>由JS发起的单向调用App的操作，主要涉及加载URL和切换到原生界面，可对应如下action：</p>
 <ul>
@@ -117,82 +87,43 @@ JSBridge.callJS = callJS
 <li>loadContent：跳转到原生界面</li>
 </ul>
 <p>loadUrl调用的参考协议如下：</p>
-<pre><code>NativeBridge.callNative({
- action: &apos;loadUrl&apos;,
- params: { url },
- whoCare: 0
-})
-</code></pre><p>这里NativeBridge是App的原生对象，其callNative方法被调用时，会收到一个对象（字典/映射）参数。根据这个参数的action属性的值，App可知需要执行的操作是加载URL。于是再取得params属性中的url，发送请求即可。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">NativeBridge</span><span class="selector-class">.callNative</span>(&#123;</div><div class="line">    <span class="attribute">action</span>: <span class="string">'loadUrl'</span>,</div><div class="line">    params: &#123; url &#125;,</div><div class="line">    <span class="selector-tag">whoCare</span>: 0</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>这里NativeBridge是App的原生对象，其callNative方法被调用时，会收到一个对象（字典/映射）参数。根据这个参数的action属性的值，App可知需要执行的操作是加载URL。于是再取得params属性中的url，发送请求即可。</p>
 <p>loadContent调用的参考协议如下：</p>
-<pre><code>NativeBridge.callNative({
- action: &quot;loadContent&quot;,
- params: {
- type: &quot;album&quot;,
- content: {
- album_id: &quot;1&quot;
- }
- },
- whoCare: 0
-})
-</code></pre><p>同上，这里通过params向App传递了必要参数，App负责切换到相应的原生界面。</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">NativeBridge</span><span class="selector-class">.callNative</span>(&#123;</div><div class="line">    <span class="attribute">action</span>: <span class="string">"loadContent"</span>,</div><div class="line">    <span class="attribute">params</span>: &#123;</div><div class="line">    <span class="attribute">type</span>: <span class="string">"album"</span>,</div><div class="line">    <span class="attribute">content</span>: &#123;</div><div class="line">    <span class="attribute">album_id</span>: <span class="string">"1"</span></div><div class="line">    &#125;</div><div class="line">    &#125;,</div><div class="line">    <span class="attribute">whoCare</span>: <span class="number">0</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>同上，这里通过params向App传递了必要参数，App负责切换到相应的原生界面。</p>
 <p>由App发起的单向调用JS的操作，主要涉及用户点击后退按钮（&lt;），可对应如下action：</p>
 <ul>
-<li>can_back：询问JS是否返回前是否需要用户确认</li>
+<li><p>can_back：询问JS是否返回前是否需要用户确认</p>
+<p>  can_back调用的参考协议如下：</p>
+  <figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">   JSBridge.callJS(&#123;</div><div class="line"><span class="symbol">    action:</span> <span class="string">"can_back"</span>,</div><div class="line"><span class="symbol">    params:</span> &#123;&#125;,</div><div class="line"><span class="symbol">    whoAmI:</span> <span class="number">1</span>/<span class="number">2</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>  此调用返回的值示例如下：</p>
+  <figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">   &#123;</div><div class="line"> <span class="attribute">can</span>: true,</div><div class="line"> target: <span class="string">"prev"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<p>can_back调用的参考协议如下：</p>
-<pre><code>JSBridge.callJS({
- action: &quot;can_back&quot;,
- params: {},
- whoAmI: 1/2
-})
-</code></pre><p>此调用返回的值示例如下：</p>
-<pre><code>{
- can: true,
- target: &quot;prev&quot;
-}
-</code></pre><p>顾名思义，can_back用于App询问JS：在返回上一级界面前，是否弹窗提示用户？</p>
+<p>顾名思义，can_back用于App询问JS：在返回上一级界面前，是否弹窗提示用户？</p>
 <p>返回值中的can如果是true，则直接返回，不提示；如果是false，则弹出一个确认框，请用户确认。另一个值target是与App约定的返回目标，比如prev表示返回上一级，top表示返回顶级，等等。</p>
 <h2 id="双向调用"><a href="#双向调用" class="headerlink" title="双向调用"></a>双向调用</h2><p>双向调用是JS先调用App，然后App在完成操作后再调用JS，双向通常都需要传递数据。双向调用主要涉及JS调用App原生组件和用户点击右上角按钮，可对应如下action：</p>
 <ul>
 <li>loadComponent：调用原生组件</li>
-<li>displayNextButton：显示“下一步”“保存”或“完成”按钮</li>
+<li><p>displayNextButton：显示“下一步”“保存”或“完成”按钮</p>
+<p>  loadComponent的参考协议如下：</p>
+  <figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">   <span class="selector-tag">NativeBridge</span><span class="selector-class">.callNative</span>(&#123;</div><div class="line"> <span class="attribute">action</span>: <span class="string">'loadComponent'</span>,</div><div class="line"> params: &#123;</div><div class="line"> type: <span class="string">'location'</span>,</div><div class="line"> value,</div><div class="line"> callbackName: <span class="string">'set_location'</span></div><div class="line"> &#125;,</div><div class="line"> <span class="selector-tag">whoCare</span>: 0</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>  在这个例子中，涉及JS调用App显示其实现的城市选择组件：type: ‘location’，用户选择完城市之后，App再调用set_location，将用户选择的城市名称传给JS：</p>
+  <figure class="highlight less"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">   <span class="selector-tag">JSBridge</span><span class="selector-class">.callJS</span>(&#123;</div><div class="line"> <span class="attribute">action</span>: <span class="string">'set_location'</span>,</div><div class="line"> <span class="attribute">params</span>: &#123;</div><div class="line"> <span class="attribute">value</span>: <span class="string">'北京市朝阳区'</span>,</div><div class="line"> &#125;,</div><div class="line"> <span class="attribute">whoAmI</span>: <span class="number">1</span>/<span class="number">2</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<p>loadComponent的参考协议如下：</p>
-<pre><code>NativeBridge.callNative({
- action: &apos;loadComponent&apos;,
- params: {
- type: &apos;location&apos;,
- value,
- callbackName: &apos;set_location&apos;
- },
- whoCare: 0
-})
-</code></pre><p>在这个例子中，涉及JS调用App显示其实现的城市选择组件：type: ‘location’，用户选择完城市之后，App再调用set_location，将用户选择的城市名称传给JS：</p>
-<pre><code>JSBridge.callJS({
- action: &apos;set_location&apos;,
- params: {
- value: &apos;北京市朝阳区&apos;,
- },
- whoAmI: 1/2
-})
-</code></pre><p>JS根据拿到的值更新界面，完成一次双向调用。另一个例子是JS调用原生的日期选择组件，与此类似。</p>
+<p>JS根据拿到的值更新界面，完成一次双向调用。另一个例子是JS调用原生的日期选择组件，与此类似。</p>
 <p>为什么叫displayNextButton？因为根据具体业务场景，可能存在如下三种情况：</p>
 <ul>
 <li>当前WebView不需要显示右上角按钮，比如详情页；</li>
 <li>当前WebView需要显示“下一步”或“保存”按钮，但需要禁用变灰；</li>
-<li>当前WebView需要显示“下一步”或“保存”按钮，允许用户点击。</li>
+<li><p>当前WebView需要显示“下一步”或“保存”按钮，允许用户点击。</p>
+<p>  displayNextButton协议的参考实现如下：</p>
+  <figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">   NativeBridge.callNative(&#123;</div><div class="line"><span class="symbol"> action:</span> <span class="string">"displayNextButton"</span>,</div><div class="line"><span class="symbol"> params:</span> &#123;</div><div class="line"><span class="symbol"> name:</span> <span class="string">"下一步"</span>,</div><div class="line"><span class="symbol"> enable:</span> false,</div><div class="line"><span class="symbol"> callbackName:</span> <span class="string">"save_form"</span></div><div class="line"> &#125;,</div><div class="line"><span class="symbol"> whoCare:</span> <span class="number">0</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
 </ul>
-<p>displayNextButton协议的参考实现如下：</p>
-<pre><code>NativeBridge.callNative({
- action: &quot;displayNextButton&quot;,
- params: {
- name: &quot;下一步&quot;,
- enable: false,
- callbackName: &quot;save_form&quot;
- },
- whoCare: 0
-})
-</code></pre><p>以上代码示例表明，JS调用App，告诉App显示“下一步”按钮，但是要禁用变灰，因为enable: false。如果传递的是enable: true，那么用户就可以点击“下一步”按钮了。点击之后，App再调用JS的save_form。最后，如果不想显示按钮，可以传递name: ‘’。</p>
+<p>以上代码示例表明，JS调用App，告诉App显示“下一步”按钮，但是要禁用变灰，因为enable: false。如果传递的是enable: true，那么用户就可以点击“下一步”按钮了。点击之后，App再调用JS的save_form。最后，如果不想显示按钮，可以传递name: ‘’。</p>
 <p>下面重点说一下用户点击“下一步”按钮，App调用save_form的场景。此时也分两种情况：</p>
 <ul>
 <li>JS直接保存数据</li>
