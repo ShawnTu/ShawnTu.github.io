@@ -37,9 +37,9 @@
   </section>
 
   <section class="article-entry">
-    <h1 id="一次弄懂Event-Loop"><a href="#一次弄懂Event-Loop" class="headerlink" title="一次弄懂Event Loop"></a>一次弄懂Event Loop</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Event Loop即事件循环，是指浏览器或Node的一种解决javaScript单线程运行时不会阻塞的一种机制，也就是我们经常使用<strong>异步</strong>的原理。</p>
+    <h1 id="一次弄懂Event-Loop"><a href="#一次弄懂Event-Loop" class="headerlink" title="一次弄懂Event Loop"></a>一次弄懂Event Loop</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><em>Event Loop</em>即事件循环，是指浏览器或<em>Node</em>的一种解决<em>javaScript</em>单线程运行时不会阻塞的一种机制，也就是我们经常使用<strong>异步</strong>的原理。</p>
 <h2 id="为啥要弄懂Event-Loop"><a href="#为啥要弄懂Event-Loop" class="headerlink" title="为啥要弄懂Event Loop"></a>为啥要弄懂Event Loop</h2><ul>
-<li>是要增加自己技术的深度，也就是懂得JavaScript的运行机制。</li>
+<li>是要增加自己技术的深度，也就是懂得<em>JavaScript</em>的运行机制。</li>
 <li>现在在前端领域各种技术层出不穷，掌握底层原理，可以让自己以不变，应万变。</li>
 <li>应对各大互联网公司的面试，懂其原理，题目任其发挥。</li>
 </ul>
@@ -47,8 +47,52 @@
 <ul>
 <li>堆（Heap）</li>
 </ul>
-<p>堆是一种数据结构，是利用完全二叉树维护的一组数据，堆分为两种，一种为最大堆，一种为最小堆，将根节点最大的堆叫做最大堆或大根堆，根节点最小的堆叫做最小堆或小根堆。<br>堆是线性数据结构，相当于一维数组，有唯一后继。</p>
+<p><strong>堆</strong>是一种数据结构，是利用完全二叉树维护的一组数据，堆分为两种，一种为<strong>最大堆</strong>，一种为<strong>最小堆</strong>，将根节点最大的堆叫做最大堆或大根堆，根节点最小的堆叫做最小堆或小根堆。<br><strong>堆</strong>是<strong>线性数据结构</strong>，相当于<strong>一维数组</strong>，有唯一后继。</p>
 <p>如最大堆</p>
+<p><img src="/images/一次弄懂Event Loop2.png" width="95" height="80"></p>
+<ul>
+<li>栈（Stack）</li>
+</ul>
+<p><strong>栈</strong>在计算机科学中是限定仅在表尾进行插入或删除操作的线性表。 栈是一种数据结构，它按照后进先出的原则存储数据，先进入的数据被压入栈底，最后的数据在栈顶，需要读数据的时候从栈顶开始弹出数据。<br><strong>栈</strong>是只能在<strong>某一端插入</strong>和<strong>删除</strong>的<strong>特殊线性表</strong>。</p>
+<p><img src="/images/一次弄懂Event Loop3.png" width="308" height="141"></p>
+<ul>
+<li>队列（Queue）</li>
+</ul>
+<p>特殊之处在于它只允许在表的前端（<em>front</em>）进行删除操作，而在表的后端（<em>rear</em>）进行插入操作，和栈一样，队列是一种操作受限制的线性表。<br>进行插入操作的端称为队尾，进行删除操作的端称为队头。 队列中没有元素时，称为空队列。</p>
+<p><strong>队列</strong>的数据元素又称为队列元素。在队列中插入一个队列元素称为入队，从队列中删除一个队列元素称为出队。因为队列只允许在一端插入，在另一端删除，所以只有最早进入队列的元素才能最先从队列中删除，故队列又称为先进先出（<em>FIFO—first in first out</em>）</p>
+<p><img src="/images/一次弄懂Event Loop4.png" width="277" height="135"></p>
+<h2 id="Event-Loop"><a href="#Event-Loop" class="headerlink" title="Event Loop"></a>Event Loop</h2><p>在JavaScript中，任务被分为两种，一种宏任务（MacroTask）也叫Task，一种叫微任务（MicroTask）。</p>
+<h3 id="MacroTask（宏任务）"><a href="#MacroTask（宏任务）" class="headerlink" title="MacroTask（宏任务）"></a>MacroTask（宏任务）</h3><ul>
+<li>script全部代码、setTimeout、setInterval、setImmediate（浏览器暂时不支持，只有IE10支持，具体可见MDN:<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setImmediate" target="_blank" rel="external">https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setImmediate</a> ）、I/O、UI Rendering。</li>
+</ul>
+<h3 id="MicroTask（微任务）"><a href="#MicroTask（微任务）" class="headerlink" title="MicroTask（微任务）"></a>MicroTask（微任务）</h3><ul>
+<li>Process.nextTick（Node独有）、Promise、Object.observe(废弃)、MutationObserver（具体使用方式查看这里<a href="http://javascript.ruanyifeng.com/dom/mutationobserver.html" target="_blank" rel="external">http://javascript.ruanyifeng.com/dom/mutationobserver.html</a> ）</li>
+</ul>
+<h2 id="浏览器中的Event-Loop"><a href="#浏览器中的Event-Loop" class="headerlink" title="浏览器中的Event Loop"></a>浏览器中的Event Loop</h2><p>Javascript 有一个 main thread 主线程和 call-stack 调用栈(执行栈)，所有的任务都会被放到调用栈等待主线程执行。</p>
+<h3 id="JS调用栈"><a href="#JS调用栈" class="headerlink" title="JS调用栈"></a>JS调用栈</h3><p>JS调用栈采用的是后进先出的规则，当函数执行的时候，会被添加到栈的顶部，当执行栈执行完成后，就会从栈顶移出，直到栈内被清空。</p>
+<h3 id="同步任务和异步任务"><a href="#同步任务和异步任务" class="headerlink" title="同步任务和异步任务"></a>同步任务和异步任务</h3><p>Javascript单线程任务被分为<strong>同步任务</strong>和<strong>异步任务</strong>，同步任务会在调用栈中按照顺序等待主线程依次执行，异步任务会在异步任务有了结果后，将注册的回调函数放入任务队列中等待主线程空闲的时候（调用栈被清空），被读取到栈内等待主线程的执行。</p>
+<p><img src="/images/一次弄懂Event Loop5.png" width="318" height="259"></p>
+<p>任务队列Task Queue，即队列，是一种先进先出的一种数据结构。</p>
+<p><img src="/images/一次弄懂Event Loop6.png" width="320" height="267"></p>
+<h3 id="事件循环的进程模型"><a href="#事件循环的进程模型" class="headerlink" title="事件循环的进程模型"></a>事件循环的进程模型</h3><ul>
+<li>选择当前要执行的任务队列，选择任务队列中最先进入的任务，如果任务队列为空即null，则执行跳转到微任务（MicroTask）的执行步骤。</li>
+<li>将事件循环中的任务设置为已选择任务。</li>
+<li>执行任务。</li>
+<li>将事件循环中当前运行任务设置为null。</li>
+<li>将已经运行完成的任务从任务队列中删除。</li>
+<li>microtasks步骤：进入microtask检查点。</li>
+<li>更新界面渲染。</li>
+<li>返回第一步。</li>
+</ul>
+<h3 id="执行进入microtask检查点时，用户代理会执行以下步骤："><a href="#执行进入microtask检查点时，用户代理会执行以下步骤：" class="headerlink" title="执行进入microtask检查点时，用户代理会执行以下步骤："></a>执行进入microtask检查点时，用户代理会执行以下步骤：</h3><ul>
+<li>设置microtask检查点标志为true。</li>
+<li>当事件循环microtask执行不为空时：选择一个最先进入的microtask队列的microtask，将事件循环的microtask设置为已选择的microtask，运行microtask，将已经执行完成的microtask为null，移出microtask中的microtask。</li>
+<li>清理IndexDB事务</li>
+<li>设置进入microtask检查点的标志为false。</li>
+</ul>
+<p>上述可能不太好理解，下图是我做的一张图片。</p>
+<p><img src="/images/一次弄懂Event Loop7.gif" width="320" height="186"></p>
+<p>执行栈在执行完同步任务后，查看执行栈是否为空，如果执行栈为空，就会去检查微任务(microTask)队列是否为空，如果为空的话，就执行Task（宏任务），否则就一次性执行完所有微任务。<br>每次单个宏任务执行完毕后，检查微任务(microTask)队列是否为空，如果不为空的话，会按照先入先出的规则全部执行完微任务(microTask)后，设置微任务(microTask)队列为null，然后再执行宏任务，如此循环。</p>
 
   </section>
 </article>
