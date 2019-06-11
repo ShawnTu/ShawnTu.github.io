@@ -37,7 +37,91 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="Data-URL简介与使用"><a href="#Data-URL简介与使用" class="headerlink" title="Data URL简介与使用"></a>Data URL简介与使用</h1><p>相信大家在前端开发的过程中，都应该处理过图片，其中有一项就是我们会在loader中将小的图片转为base64。那么这个base64是什么呢？我们为什么要将其转为base64呢？</p>
+<p>其实这种格式的图片，我们可以称为Data URL，下面让我们一起来简单了解下。</p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Data URL，是以data:模式为前缀的URL，允许内容的创建者将较小的文件嵌入到文档中。与常规的URL使用场合类似，下面会具体介绍可以将Data URL用在哪些地方。</p>
+<p>Data URL由data:前缀、MIME类型（表明数据类型）、base64标志位（如果是文本，则可选）以及数据本身四部分组成。</p>
+<p>语法格式如下：</p>
+<p>mediatype是一个MIME（Multipurpose Internet Mail Extension）类型字符串，如image/jpeg表示一个JPEG图片文件。如果省略，默认值为text/plain;charset=US-ASCII。</p>
+<h2 id="Data-URL的优缺点"><a href="#Data-URL的优缺点" class="headerlink" title="Data URL的优缺点"></a>Data URL的优缺点</h2><ol>
+<li>Data URL的优势</li>
+</ol>
+<p>和传统的外部资源引用，Data URL有着以下优势：</p>
+<ul>
+<li><p>当访问外部资源很麻烦或受限时，可以将外部资源转为Data URL引用(这个比较鸡肋)</p>
+</li>
+<li><p>当图片是在服务器端用程序动态生成，每个访问用户显示的都不同时，这是需要返回一个可用的URL（场景较少）</p>
+</li>
+<li><p>当图片的体积太小，占用一个HTTP会话不是很值得时（雪碧图可以出场了）</p>
+</li>
+</ul>
+<ol>
+<li>Data URL的缺点</li>
+</ol>
+<p>虽然Data URL允许使用者将文件嵌入到文档中，这在某些场景下较为合适，但是Data URL也有一些缺点：</p>
+<ul>
+<li><p>体积更大：Base64编码的数据体积通常是原数据的体积4/3，也就是Data URL形式的图片会比二进制格式的图片体积大1/3</p>
+</li>
+<li><p>不会缓存：Data URL形式的图片不会被浏览器缓存，这意味着每次访问这样的页面时都被下载一次。这是一个使用效率方面的问题——尤其当这个图片被整个网站大量使用的时候。</p>
+</li>
+</ul>
+<h2 id="如何获取base64编码"><a href="#如何获取base64编码" class="headerlink" title="如何获取base64编码"></a>如何获取base64编码</h2><ol>
+<li>Linux/Mac OS X下可以使用uuencode命令</li>
+</ol>
+<p>如执行uuencode -m hello-base64 hello，会得到如下结果：</p>
+<ol>
+<li>使用原生Web API编码/解码</li>
+</ol>
+<p>Javascript中有两个函数负责编码和解码base64字符串，分别是atob和btoa。</p>
+<p>两者都只针对Data URL中的data进行处理。</p>
+<ul>
+<li><p>atob(): 负责解码已经使用base64编码了的字符串。</p>
+</li>
+<li><p>btoa(): 将二进制字符串转为base64编码的ASCII字符串。</p>
+</li>
+</ul>
+<ol>
+<li>Canvas的toDataURL方法</li>
+</ol>
+<p>Canvas提供了toDataURL方法，用于获取canvas绘制内容，将其转为base64格式。</p>
+<p>如下图所示，文本框中的内容即为canvas中绘制内容的base64格式。</p>
+<p>Html:</p>
+<p>JS:</p>
+<ol>
+<li>使用FileReader API的readAsDataURL方法</li>
+</ol>
+<p>FileReader API提供的readAsDataURL方法能够返回一个基于base64编码的Data URL。</p>
+<p>如下所示，选择文件后返回Data URL。</p>
+<p>注意，别选大的文件，选个小的试试就行，LOL。</p>
+<p>Html:</p>
+<p>JS:</p>
+<h2 id="Data-URL能用在何处呢？"><a href="#Data-URL能用在何处呢？" class="headerlink" title="Data URL能用在何处呢？"></a>Data URL能用在何处呢？</h2><p>最开始已经说了Data URL，是以data:模式为前缀的URL，使用场合与常规URL相同，即常规URL能够使用的场合，Data URL也可以使用。如：浏览器地址栏、link中引入css文件、script中引入js文件、img src中引入图片、video中引入视频、iframe中引入网页、css background url引入背景。</p>
+<ol>
+<li>在浏览器地址栏中使用Data URL</li>
+</ol>
+<p>在浏览器地址栏中使用Data URL，打开上述canvas中绘制的内容</p>
+<p>注意：chrome 从56开始将Data URL标记为“不安全”，从60开始屏蔽从页面打开的 Data URI 网址，可以右键新标签打开。详情(<a href="http://www.cnblogs.com/ziyunfei/p/6753002.html" target="_blank" rel="external">http://www.cnblogs.com/ziyunfei/p/6753002.html</a>)</p>
+<p>Html:</p>
+<ol>
+<li>在script/img/video/iframe等标签的src属性内使用Data URL</li>
+</ol>
+<p>以在script中使用Data URL为例（在原文中点击按钮之后，会弹出alert，alert的内容通过Data URL设定）：</p>
+<p>JS:</p>
+<ol>
+<li>在<link>标签的href中使用Data URL</li>
+</ol>
+<p>如下图，看在原文中点击按钮，会发现按钮中文字的颜色变成了红色，样式通过Data URL设定。</p>
+<p>JS:</p>
+<ol>
+<li>在css样式background的url中使用Data URL</li>
+</ol>
+<p>执行下面代码，会将上面Canvas创建的图片的Data URL作为背景展示。</p>
+<p>JS:</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ol>
+<li>MDN Data URLs：<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs</a></li>
+</ol>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MzA5NzkwNDk3MQ==&amp;mid=2650589829&amp;idx=1&amp;sn=b65783718334b43be1b3cbcb586669d1&amp;chksm=8891daa1bfe653b75949df87ce2c2f3f732e4cbd2a5945b55ee5feabb627f05358dc5acb3b5f&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MzA5NzkwNDk3MQ==&amp;mid=2650589829&amp;idx=1&amp;sn=b65783718334b43be1b3cbcb586669d1&amp;chksm=8891daa1bfe653b75949df87ce2c2f3f732e4cbd2a5945b55ee5feabb627f05358dc5acb3b5f&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +140,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="Data-URL简介与使用">"
 >
   Tweet
 </a>

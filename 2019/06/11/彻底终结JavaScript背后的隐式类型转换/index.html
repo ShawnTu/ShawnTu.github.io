@@ -37,7 +37,76 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="彻底终结JavaScript背后的隐式类型转换"><a href="#彻底终结JavaScript背后的隐式类型转换" class="headerlink" title="彻底终结JavaScript背后的隐式类型转换"></a>彻底终结JavaScript背后的隐式类型转换</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>正文从这开始～～</p>
+<p>网上已经有很多 JS 隐式类型转换相关的博客, 很多面试者专门复习过此问题, 但依然挡不住面试官一个又一个的无聊小题目~</p>
+<p>如果你还在为这些面试题烦恼, 那恭喜你来对了地方!</p>
+<p>看完此文你可以完全不需要背诵复杂冗长的 ECMA 规范, 用逻辑即可推理</p>
+<p>现在, 我们假装从 JS 设计者的角度来聊聊隐式类型转换, 首先要记住, JS 作者的”初衷”是美好的, 他希望 == 是最顺手最快捷的比较</p>
+<h2 id="为什么-false"><a href="#为什么-false" class="headerlink" title="为什么 [] == false ?"></a>为什么 [] == false ?</h2><p>首先我们知道 [] 和 false 一个是对象, 一个是布尔值, 类型不同, 需要类型转换再做比较</p>
+<p>要注意, JS 中规定, 如果 == 中有布尔值, 只能转换为数字, 那为什么不是转换成字符串呢?</p>
+<p>因为如果布尔值转换成字符串那就是 ‘true’ 和 ‘false’, 那这种对比就毫无意义了</p>
+<p>这也符合我们的常识, 很多语言也是类似的设定, 也就是 Bool 属于一种 Int</p>
+<p>所以此问题可以转换成: 为什么 [] == 0?</p>
+<h2 id="为什么-0"><a href="#为什么-0" class="headerlink" title="为什么 [] == 0 ?"></a>为什么 [] == 0 ?</h2><p>我们知道 Primitive(原值)和非 Primitive 比较, 需要把非 Primitive 转换成 Primitive 才可以</p>
+<p>[] 是一个对象, 因此需要 toPrimitive()</p>
+<p>简单的说, 大部分对象最后都是用 toString() 来转换成 Primitive</p>
+<blockquote>
+<p>此处没聊 toPrimitive() 中的 valueOf() 单纯是因为面试题很少涉及</p>
+</blockquote>
+<p>你也许会问为啥是用 toString 不是 toNumber 之类的呢? 因为每个对象都有 toString 方法, Object.prototype.toString, 更上层的对象也会重写 toString 方法</p>
+<p>继续刨根问底, 为啥每个对象都有 toString 而不是 toNumber 呢?</p>
+<p>这就是 JS 对新人友好的地方, JS 的对象都可以打印输出, 自带人性化展示, 在终端上人性化展示, 那当然是用字符串啦, 因此选择用 toString 转换 Primitive 理所因当</p>
+<p>我们来看看数组的 toString, 数组的 toString 相当于 join()</p>
+<p>所以此问题可以转换成: 为什么 ‘’ == 0 ?</p>
+<p>为了验证我们的想法, 我们来尝试一些更奇葩的对象和字符串的 == 比较</p>
+<p>({}).toString() 是 [object Object], 所以 ‘[object Object]’ == {} 果然也是 true</p>
+<h2 id="为什么-‘’-0"><a href="#为什么-‘’-0" class="headerlink" title="为什么 ‘’ == 0 ?"></a>为什么 ‘’ == 0 ?</h2><p>字符串和数字比较会把字符串转换成数字</p>
+<p>问题来了, 为什么不是把数字转换成字符串呢? 从设计者的角度可能会这样想</p>
+<blockquote>
+<p>都转成数字能处理的复杂场景更多, 容错性更高!</p>
+</blockquote>
+<p>这样对开发者就会很方便</p>
+<p>要注意, 字符串转成数字不是用的 parseInt() 或者 parseFloat(), 而是 Number()</p>
+<p>所以此问题可以继续转换成: 为什么 0 == 0? 显然就是返回 true</p>
+<h3 id="转换路程"><a href="#转换路程" class="headerlink" title="转换路程"></a>转换路程</h3><p>推理到此结束, 我们回顾一下这个比较的转换规程</p>
+<ul>
+<li><p>[] == false</p>
+</li>
+<li><p>[] == 0</p>
+</li>
+<li><p>‘’ == 0</p>
+</li>
+<li><p>0 == 0</p>
+</li>
+</ul>
+<p>看到这里我们猛然想明白了为啥 NaN 不能等于自身!</p>
+<h2 id="为什么-NaN-NaN"><a href="#为什么-NaN-NaN" class="headerlink" title="为什么 NaN !== NaN?"></a>为什么 NaN !== NaN?</h2><p>我们不妨来看看 ‘abc’ == NaN 做比较的过程</p>
+<p>因为 NaN 也是数字类型, 所以我们需要把 ‘abc’ 转换为数字</p>
+<p>‘abc’ == NaN 相当于 Number(‘abc’) == NaN 相当于 NaN == NaN, 如果 NaN 可以等于自身的话, 这种情况就会返回 true</p>
+<p>那整个隐式转换就乱套了</p>
+<p>因此 NaN 不能等于自身也是哑巴吃黄连, 有苦说不出啊</p>
+<blockquote>
+<p>以上纯属本人推测, 概不负责, 毕竟 Java 中的 NaN 也不能等于自身</p>
+</blockquote>
+<h3 id="隐式转换的恶果"><a href="#隐式转换的恶果" class="headerlink" title="隐式转换的恶果"></a>隐式转换的恶果</h3><p>NaN 不能等于自身是隐式转换最大的恶果</p>
+<p>你可以尝试如下操作</p>
+<p>有比较的地方, 就会有 NaN 特殊处理, 否则就是不严谨</p>
+<p>简单逻辑复杂化, 说的就是你 NaN, 可以说 “隐式转换一时爽”~</p>
+<h2 id="为什么-null-0-是-false-呢"><a href="#为什么-null-0-是-false-呢" class="headerlink" title="为什么 null == 0 是 false 呢 ?"></a>为什么 null == 0 是 false 呢 ?</h2><p>两边类型不同, 是不是也要类型转换呢?</p>
+<p>要是能转的话确实要转, 但 null 和数字0本身已经是 Primitive 了, 没有机会再走一遍 toPrimitive(), 因此等号两边始终无法转换成同类型, 只能返回 false</p>
+<h2 id="为什么-null-undefined"><a href="#为什么-null-undefined" class="headerlink" title="为什么 null == undefined ?"></a>为什么 null == undefined ?</h2><p>和上面的问题一样, null 和 undefined 都是 Primitive, 而且也不是字符串或者数字, 转无可转</p>
+<p>但 JS 专门规定了 null == undefined 就是返回 true, 属于一种专门的特殊情况</p>
+<p>The Abstract Equality Comparison Algorithm</p>
+<blockquote>
+<p>If x is null and y is undefined, return true.<br>If x is undefined and y is null, return true.</p>
+</blockquote>
+<h2 id="为什么-是-true"><a href="#为什么-是-true" class="headerlink" title="为什么 !![] 是 true?"></a>为什么 !![] 是 true?</h2><p>这里面不涉及任何 == 比较, 和上面的题目完全是两类题目, 千万不可搞混</p>
+<p>此题直接判断这个值是不是 Falsy(假值) 即可, 只要不是这几个值, 都是 true</p>
+<p>Falsy 的值有 0, ‘’, false, NaN, null, undefined</p>
+<p>类似的问题 !![] == true, 因为这个表达式先要计算 !![], 它已经是 true 了</p>
+<h2 id="为什么-ESLint-中会各种限制使用"><a href="#为什么-ESLint-中会各种限制使用" class="headerlink" title="为什么 ESLint 中会各种限制使用 ==?"></a>为什么 ESLint 中会各种限制使用 ==?</h2><p>我觉得完全可以理解, == 虽然也是一种便捷的转换, 但并不符合传统语言的习惯, 工程化企业化的项目不想用这种 “黑魔法” 也是一种正确的选择</p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232063&amp;idx=1&amp;sn=e53c1aeefee5e691616f2f3fc80992a6&amp;chksm=bd494ebb8a3ec7ade40eaddb69a398186218da57dfbca5307465857ec480736432ed0bae9a71&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=cDATSj8%2B84IDuu89ZrEa%2BlsOLeMMtcYRKyeGMwFDGAq9MRBxx7rpzr0Lw98DEvX7#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232063&amp;idx=1&amp;sn=e53c1aeefee5e691616f2f3fc80992a6&amp;chksm=bd494ebb8a3ec7ade40eaddb69a398186218da57dfbca5307465857ec480736432ed0bae9a71&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=cDATSj8%2B84IDuu89ZrEa%2BlsOLeMMtcYRKyeGMwFDGAq9MRBxx7rpzr0Lw98DEvX7#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +125,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="彻底终结JavaScript背"
 >
   Tweet
 </a>

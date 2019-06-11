@@ -37,7 +37,216 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="JavaScript的环境模型"><a href="#JavaScript的环境模型" class="headerlink" title="JavaScript的环境模型"></a>JavaScript的环境模型</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>环境模型（Environment Model） 这一个概念，它用于解释Scheme的函数计算规则。今日早读文章由@佳木授权分享。</p>
+<p>正文从这开始～～</p>
+<p>《SICP》提到了 环境模型（Environment Model） 这一个概念，它用于解释Scheme的函数计算规则。同样，它也适用于JavaScript的函数计算规则。</p>
+<h2 id="环境是什么"><a href="#环境是什么" class="headerlink" title="环境是什么"></a>环境是什么</h2><p>节选《SICP》 3.2 The Environment Model of Evaluation</p>
+<blockquote>
+<p>环境在计算过程必不可少，因为它决定了计算表达式的上下文。 可以这样认为，表达式本身在程序语言里毫无意义，表达式的意义取决于它计算时所在的环境。就算是(+ 1 1)这一条极其简单的表达式，也需要在符号+表示加法的上下文里才能进行计算。</p>
+</blockquote>
+<p>JavaScript的解释器就充当着环境的角色。在该环境下，表达式1 + 1的计算结果为2，表达式Date()调用一个函数并返回当前的时间，表达式() =&gt; 1定义了一个返回1的函数……总之，对程序而言，环境就是在计算过程为符号提供实际意义的东西。</p>
+<h2 id="环境模型"><a href="#环境模型" class="headerlink" title="环境模型"></a>环境模型</h2><h3 id="变量环境"><a href="#变量环境" class="headerlink" title="变量环境"></a>变量环境</h3><p>环境模型中的环境具体指的是变量环境。函数在计算时会根据 环境（environment） 决定变量的值，从而决定它的计算结果。</p>
+<h3 id="环境的创建和作用"><a href="#环境的创建和作用" class="headerlink" title="环境的创建和作用"></a>环境的创建和作用</h3><p>函数在调用时会先创建一个环境，然后在该环境中计算函数的内容。</p>
+<p>表达式add10(2)（&gt;5）的计算过程：</p>
+<ul>
+<li><p>创建环境$add10。（&gt;5）</p>
+</li>
+<li><p>给环境$add10中的变量value赋值2。（&gt;5）</p>
+</li>
+<li><p>进入环境$add10。</p>
+</li>
+<li><p>在环境$add10中，给变量increment赋值10。（&gt;2）</p>
+</li>
+<li><p>在环境$add10中，获得变量value的值2。（&gt;3）</p>
+</li>
+<li><p>在环境$add10中，获得变量increment的值10。（&gt;3）</p>
+</li>
+<li><p>计算表达式2 + 10得到12。（&gt;3）</p>
+</li>
+<li><p>返回12。（&gt;3）</p>
+</li>
+<li><p>离开环境$add10。</p>
+</li>
+</ul>
+<p>值得一提的是，形参也是变量，它在形参列表里定义，在函数调用时获得初始值。</p>
+<h3 id="变量绑定"><a href="#变量绑定" class="headerlink" title="变量绑定"></a>变量绑定</h3><p>环境使用变量绑定来存放变量的值， 绑定（binding） 与函数中的变量一一对应。</p>
+<h3 id="约束变量和自由变量"><a href="#约束变量和自由变量" class="headerlink" title="约束变量和自由变量"></a>约束变量和自由变量</h3><p>在函数中定义一个变量，变量的意义取决于函数的内容，它的作用范围也被约束在函数之中，此时的变量被称为 约束变量（bound variable） 。</p>
+<p>在函数中使用一个没有定义的变量，它的作用范围不受函数的约束，此时的变量被称为 自由变量（free variable） 。</p>
+<p>var关键字可以定义变量：</p>
+<ul>
+<li><p>在函数main中，变量x（&gt;2、4），addX（&gt;3、8），value（&gt;7、8）皆为约束变量。</p>
+</li>
+<li><p>在函数addX中，变量value（&gt;3、5），increment（&gt;4、5）是约束变量，变量x（&gt;4）是自由变量。</p>
+</li>
+</ul>
+<h3 id="绑定与变量"><a href="#绑定与变量" class="headerlink" title="绑定与变量"></a>绑定与变量</h3><p>在函数的计算过程中，变量定义会使当前的环境加入对应的绑定。</p>
+<p>上文中表达式main()（&gt;10）的计算过程产生了2个环境，$main和$addX：</p>
+<ul>
+<li><p>环境$main拥有3个绑定，x，addX，*value。</p>
+</li>
+<li><p>环境$addX拥有2个绑定，value，increment。</p>
+</li>
+</ul>
+<p>可见，绑定存放的是约束变量的值，约束变量的值可以直接从当前环境获取。</p>
+<p>而自由变量的值需要从其他环境获取，该环境是自由变量定义时所在的环境，拥有自由变量的绑定。</p>
+<p>上文中表达式addX(value)（&gt;8）的计算过程：</p>
+<ul>
+<li><p>获得环境$main中绑定*addX的值addX函数。（&gt;8）</p>
+</li>
+<li><p>获得环境$main中绑定*value的值2。（&gt;8）</p>
+</li>
+<li><p>修改环境$addX中绑定*value的值为2。（&gt;8）</p>
+</li>
+<li><p>获得环境$main中绑定*x的的值10。（&gt;4）</p>
+</li>
+<li><p>修改环境$addX中绑定*increment的值为10。（&gt;4）</p>
+</li>
+<li><p>获得环境$addX中绑定*value的值2。（&gt;5）</p>
+</li>
+<li><p>获得环境$addX中绑定*increment的值10。（&gt;5）</p>
+</li>
+</ul>
+<p>计算function表达式或lambda表达式会得到一个函数，这种情况一般被称为函数定义。方便起见，本文将值是变量的函数称为函数。</p>
+<p>就这样，函数在计算时只要找到对应的绑定，就能确定一个变量的值。</p>
+<h2 id="环境引用"><a href="#环境引用" class="headerlink" title="环境引用"></a>环境引用</h2><p>环境不仅保存了变量绑定，还会保存一个 环境引用（environment pointer） ，环境引用指向其他的变量环境。通过环境引用，自由变量可以从其他环境寻找自己对应的绑定。</p>
+<h3 id="环境引用的来源"><a href="#环境引用的来源" class="headerlink" title="环境引用的来源"></a>环境引用的来源</h3><p>函数在定义时会把当前环境的引用记录下来。在调用函数后，新的环境会得到函数中的环境引用并将此保存。<br>也就是说，一个函数在计算时的环境，拥有函数在定义时的环境的引用。</p>
+<p>表达式getCounter(0)（&gt;6）和counter()（&gt;7）分别创建了两个环境：</p>
+<ul>
+<li><p>环境$getCounter拥有全局环境的引用。</p>
+</li>
+<li><p>环境$counter拥有环境$getCounter的引用。</p>
+</li>
+</ul>
+<p>一些看似不在函数中定义的函数，其定义时也身处环境中，该环境被称为全局环境。函数getCounter就保存了全局环境的引用。</p>
+<p>环境引用与绑定<br>函数在计算过程中定义函数，如同代码文本结构那样一层包裹一层，里层的函数定义是外层函数中的一条表达式，里层函数创建的环境通过引用连接外层函数创建的环境。</p>
+<p>因此，一个变量在当前环境找不到对应的绑定时，可以通过引用一层层回溯到它定义时所在的环境，从而找到该绑定。自由变量便是通过这种方法找到自己对应的绑定。</p>
+<p>上文中表达式counter()（&gt;7）的计算过程：</p>
+<ul>
+<li><p>使用变量counter。（&gt;7)</p>
+</li>
+<li><p>在当前环境（全局环境）找到变量绑定*counter，它的值是一个函数 。</p>
+</li>
+<li><p>调用函数counter会创建环境$counter。（&gt;7）</p>
+</li>
+<li><p>环境$counter从函数counter得到环境$getCounter的引用。</p>
+</li>
+<li><p>进入环境$counter。</p>
+</li>
+<li><p>使用变量start。（&gt;3）</p>
+</li>
+<li><p>在环境$counter找不到绑定*start。</p>
+</li>
+<li><p>环境$counter通过引用定位到环境$getCounter。</p>
+</li>
+<li><p>在环境$getCounter中找到绑定*start。</p>
+</li>
+<li><p>返回绑定*start的值0作为函数的计算结果。（&gt;3）</p>
+</li>
+<li><p>令绑定*start的值自增1，从0变为1。（&gt;3）</p>
+</li>
+<li><p>离开环境$counter。</p>
+</li>
+</ul>
+<p>每次计算表达式counter()，绑定*start的值都会自增1，并依次返回0,1,2,3……</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>函数在定义时会保存当前 环境 的 引用 。</p>
+<p>一旦函数被调用，就会创建一个新的环境，新的环境拥有函数定义时环境的引用。</p>
+<p>函数中的变量定义表达式会给新环境加入 绑定 。</p>
+<p>函数使用变量就是访问环境中对应的绑定。</p>
+<p>如果变量在当前环境找不到对应的绑定，就会通过引用一层层回溯到它定义时所在环境，从而找到它的绑定。</p>
+<p>而这种访问其他变量环境的机制，通常被人称为 闭包 。</p>
+<h2 id="模拟环境模型"><a href="#模拟环境模型" class="headerlink" title="模拟环境模型"></a>模拟环境模型</h2><p>下文将讲述如何用js模拟环境模型。在这个模拟环境模型中，不需要用到js的变量定义语法也能使用闭包。</p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>模拟环境模型不是编写函数的解释器，只是将环境变为可操作的实体，用来解释函数中的变量。</p>
+<p>首先确定模拟环境的使用方式。为了能在函数中使用环境，环境将作为参数传入被调用的函数：</p>
+<h3 id="class-Environment"><a href="#class-Environment" class="headerlink" title="class Environment"></a>class Environment</h3><p>函数通过环境使用变量，环境应有getVariable和setVariable方法。</p>
+<p>变量在使用前要有定义，环境应有defineVariable方法。</p>
+<p>此外，函数在定义时会保存当前环境的引用，环境应有defineFunction方法。</p>
+<p>因此，代表环境的class是这样的：</p>
+<h3 id="bindingContainer-member"><a href="#bindingContainer-member" class="headerlink" title="bindingContainer member"></a>bindingContainer member</h3><p>环境可以看作是变量（绑定）的容器，应有一个bindingContainer成员用来存放变量。</p>
+<p>考虑到前端js的全局变量可以在window对象上找到，bindingContainer使用Object类型的对象的话，可以与window[name]同样的形式bindingContainer[name]来访问变量。</p>
+<p>因此，变量定义、取值、赋值可以表达为：</p>
+<h3 id="defineVariable-method"><a href="#defineVariable-method" class="headerlink" title="defineVariable method"></a>defineVariable method</h3><p>Environment的defineVariable方法实现很直接，为当前环境加入绑定:</p>
+<h3 id="environmentPointer-member"><a href="#environmentPointer-member" class="headerlink" title="environmentPointer member"></a>environmentPointer member</h3><p>在当前环境使用的变量，绑定有可能在别的环境中，应有一个代表环境引用的成员environmentPointer。<br>且environmentPointer是Environment类型。</p>
+<h3 id="findBindingContainer-method"><a href="#findBindingContainer-method" class="headerlink" title="findBindingContainer method"></a>findBindingContainer method</h3><p>取值和赋值都需要找到变量的绑定，应有一个共同的方法findBindingContainer用来查找绑定。<br>为了方便赋值进行，方法返回的是绑定的容器。</p>
+<p>变量在当前环境找不到绑定时，会通过引用向上一层环境查找。这是递归的，因此findBindingContainer的表达为：</p>
+<p>Object类型的对象自带hasOwnProperty方法判断自己是否拥有某个成员。</p>
+<h3 id="Environment-End-member"><a href="#Environment-End-member" class="headerlink" title="Environment.End member"></a>Environment.End member</h3><p>显然，通过引用一直向上遍历环境是有尽头的，在这里规定环境的尽头Environment.End为null：</p>
+<h3 id="getVariable-method"><a href="#getVariable-method" class="headerlink" title="getVariable method"></a>getVariable method</h3><p>有了findBindingContainer方法，便能轻易写出getVariable方法：</p>
+<h3 id="setVariable-method"><a href="#setVariable-method" class="headerlink" title="setVariable method"></a>setVariable method</h3><p>同上，setVariable方法的表达为：</p>
+<h3 id="defineFunction-method"><a href="#defineFunction-method" class="headerlink" title="defineFunction method"></a>defineFunction method</h3><p>模拟环境模型不具备定义函数的功能，defineFunction只需令已定义的函数保存当前环境的引用。</p>
+<p>js函数无法直接保存引用和创建模拟环境，因此需要一个用来代理函数的对象，假设defineFunction的表达为：</p>
+<h3 id="class-Function"><a href="#class-Function" class="headerlink" title="class $Function"></a>class $Function</h3><p>代理函数的对象使用saveEnvironmentPointer方法保存环境引用，使用getCall方法返回实际被调用的函数。</p>
+<p>被代理的函数，就是使用模拟环境的函数$func，显然$func不能被直接调用。它需要：</p>
+<ul>
+<li><p>创建新的环境。</p>
+</li>
+<li><p>在新环境中加入可能的实际参数。</p>
+</li>
+<li><p>以新环境为参数。</p>
+</li>
+</ul>
+<p>因此，代理函数的对象应具有call方法，以此满足$func被调用的需求。</p>
+<p>综上所述，代理函数的对象类型是这样的：</p>
+<p>$Function还应有这样三个成员：</p>
+<ul>
+<li><p>使用模拟环境的函数$func。</p>
+</li>
+<li><p>描述函数$func的参数列表parameterList。</p>
+</li>
+<li><p>$func定义时所在环境的引用environmentPointer。</p>
+</li>
+</ul>
+<p>值得一提的是，函数$func只有一个表示环境的参数$，无法表达普通函数的参数列表。因此需要parameterList来描述它的参数列表，用一个字符串数组便能表达。</p>
+<h3 id="saveEnvironmentPointer-method"><a href="#saveEnvironmentPointer-method" class="headerlink" title="saveEnvironmentPointer method"></a>saveEnvironmentPointer method</h3><p>saveEnvironmentPointer方法的实现很直接：</p>
+<h3 id="getCall-method"><a href="#getCall-method" class="headerlink" title="getCall method"></a>getCall method</h3><p>getCall方法实际返回的是call方法：</p>
+<p>由于call方法的实现用到其他成员，call在返回时需要绑定this。</p>
+<h3 id="call-method"><a href="#call-method" class="headerlink" title="call method"></a>call method</h3><p>如上文所述，call方法作为实际被调用的函数，它会：</p>
+<ul>
+<li><p>创建新的环境。</p>
+</li>
+<li><p>在新环境中加入可能的实际参数。</p>
+</li>
+</ul>
+<p>以新环境为参数调用$func函数。</p>
+<h3 id="Environment-constructor"><a href="#Environment-constructor" class="headerlink" title="Environment constructor"></a>Environment constructor</h3><p>至此，补充一下Environment的构造方法，上一层环境引用在构造新环境时传入：</p>
+<h3 id="Function-constructor"><a href="#Function-constructor" class="headerlink" title="$Function constructor"></a>$Function constructor</h3><p>$Function在构造时只需要从外部传入$func和parameterList：</p>
+<p>参数列表默认为空数组。</p>
+<h3 id="Environment-Global-member"><a href="#Environment-Global-member" class="headerlink" title="Environment.Global member"></a>Environment.Global member</h3><p>在使用模拟环境之前补充全局环境的定义：</p>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>获得模拟环境模型代码的整合。</p>
+<p>例1</p>
+<p>原代码：</p>
+<p>使用模拟环境的代码：</p>
+<p>例2</p>
+<p>原代码：</p>
+<p>使用模拟环境的代码：</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>Environment.js的主要意义是让人熟悉环境模型的概念，作为代码没有太多的使用价值。</p>
+<p>这里有一个展示环境模型细节的版本。它通过console打印每一阶段的内容。这是它的demo。</p>
+<p>Environment.detail.js在使用上与Environment.js有微小的差异，$Function的构造函数多了一个用作函数名的参数。</p>
+<h2 id="验证环境模型"><a href="#验证环境模型" class="headerlink" title="验证环境模型"></a>验证环境模型</h2><p>以chrome为观察平台，通过console.dir方法可以展示一个对象的状态。</p>
+<p>特别的，console.dir一个函数可以查看它的环境信息。</p>
+<h3 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h3><p>执行以下代码：</p>
+<p>在Console展开foo可见：</p>
+<p>实际上， 作用域（scope） 就是环境的实现，从console.dir看到的[[Scopes]]属性便包含了环境的信息。</p>
+<p>Global是作用域的类型之一，代表的是全局作用域。全局作用域全局环境，可见函数foo保存了全局环境的引用。</p>
+<h3 id="作用域链"><a href="#作用域链" class="headerlink" title="作用域链"></a>作用域链</h3><p>执行以下代码：</p>
+<p>在Console展开f2可见：</p>
+<p>[[Scopes]]是一个数组，它表示的是作用域链。环境也是一个链表，从环境模型的角度看待，这是把环境引用的关系转化为数组，数组前面的环境保存后面环境的引用。</p>
+<p>函数f2保存了环境$f1的引用，环境$1保存了全局环境的引用。这种信息同样可以从[[Scopes]]获得。<br>Closure也是作用域的类型之一，还能从作用域“Closure (f1)”得知环境$f1包含了绑定*s1。</p>
+<h3 id="消失的变量"><a href="#消失的变量" class="headerlink" title="消失的变量"></a>消失的变量</h3><p>上文中，作用域“Closure (f1)”只包含了s1。f2也是变量，根据环境模型，它理应包含两个变量的状态，s1和f2。</p>
+<p>实际上，这是环境模型的实践被js优化过所造成的结果。</p>
+<p>解释器在执行代码之前会对代码进行分析。从分析中，可以知道一些变量除了定义它的函数，不在别的函数内出现，或者说不被别的函数使用。这意味着，这些变量可以在函数返回时从当前环境中移除，而不影响到后续代码的运行。</p>
+<p>甚至，如果设置一种专门用来被别的环境引用的环境，那么只有那些被其他函数所用到的变量，才会加入到这种环境中。那些不被别的函数使用的变量，就能进一步地，在函数不需要它们时提前被释放。</p>
+<p>js就是如此，作用域只会捕捉那些被其他函数使用的变量。</p>
+<p>上文，函数f1中只有变量s1被其他函数使用，因此作用域“Closure (f1)”只捕获了变量s1。 下面是作用域捕获f2的例子。</p>
+<p>这次函数f1中只有变量f2被其他函数使用，因此作用域“Closure (f1)”只捕获了变量f2。</p>
+<h3 id="消失的作用域"><a href="#消失的作用域" class="headerlink" title="消失的作用域"></a>消失的作用域</h3><p>进一步地，如果一个函数没有定义变量，亦或是它的变量都不被其他函数所用，那么它创建的环境就没有被引用的必要，取而代之的是它本身保存的环境引用。</p>
+<p>同样的，js会移除不必要的作用域。</p>
+<p>执行以下代码：</p>
+<p>可见，f1函数调用时创建的环境$1、作用域“Closure (f1)”被移除了。</p>
+<p>另一个移除作用域的例子：</p>
+<p>再看看使用eval的例子：</p>
+<p>js的eval函数可以执行动态代码，解释器无法通过代码分析它未来的执行内容，只能让函数保留所有相关环境的引用。</p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232256&amp;idx=1&amp;sn=2ec349dd8a919b1ef4400574c060b23a&amp;chksm=bd4941848a3ec89221c02b84469c3ed45529b343ebd28143f85c7af1c400227a2d669b54a0d7&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=cDATSj8%2B84IDuu89ZrEa%2BlsOLeMMtcYRKyeGMwFDGAq9MRBxx7rpzr0Lw98DEvX7#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232256&amp;idx=1&amp;sn=2ec349dd8a919b1ef4400574c060b23a&amp;chksm=bd4941848a3ec89221c02b84469c3ed45529b343ebd28143f85c7af1c400227a2d669b54a0d7&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=cDATSj8%2B84IDuu89ZrEa%2BlsOLeMMtcYRKyeGMwFDGAq9MRBxx7rpzr0Lw98DEvX7#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +265,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="JavaScript的环境模型"
 >
   Tweet
 </a>

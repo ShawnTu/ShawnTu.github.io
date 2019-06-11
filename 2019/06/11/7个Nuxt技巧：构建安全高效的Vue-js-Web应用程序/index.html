@@ -37,7 +37,30 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="7个Nuxt技巧：构建安全高效的Vue-js-Web应用程序"><a href="#7个Nuxt技巧：构建安全高效的Vue-js-Web应用程序" class="headerlink" title="7个Nuxt技巧：构建安全高效的Vue.js Web应用程序"></a>7个Nuxt技巧：构建安全高效的Vue.js Web应用程序</h1><blockquote>
+<p>Nuxt.js是一种创建Vue.js通用应用的开源框架，与传统的Vue SPA相比，该框架SSR（服务端渲染）将带来大量的SEO提升，提供更好的用户体验和。随着Nuxt2.7版本的发布，作者带大家回顾下以前给出的技巧，看看那些仍然是开发中不错的建议。</p>
+</blockquote>
+<h2 id="使用自定义路由索引文件"><a href="#使用自定义路由索引文件" class="headerlink" title="使用自定义路由索引文件"></a>使用自定义路由索引文件</h2><p>这仍是一种便捷有用的小技巧。使用技巧这个词是因为我知道用 Nuxt 的 route module 来实现是一种适当的方式。不过，如果不需要访问 VueRouter 的所有特性，用 extendRoutes() 也可以做到。</p>
+<p>相关链接：</p>
+<p>Nuxt的route module：<br><a href="https://github.com/nuxt-community/router-module" target="_blank" rel="external">https://github.com/nuxt-community/router-module</a><br>extendRoutes：<br><a href="https://nuxtjs.org/api/configuration-router/#extendroutes" target="_blank" rel="external">https://nuxtjs.org/api/configuration-router/#extendroutes</a></p>
+<h2 id="根据状态加载组件"><a href="#根据状态加载组件" class="headerlink" title="根据状态加载组件"></a>根据状态加载组件</h2><p>根据HTTP的请求活动使用Nuxt的加载组件，可能不如在单个页面上简单的使其无效并调用start()和finish()进行手动控制来得有效。为了让其在一个网页中无效，可以将loading的属性设置为false，该功能在其2.0版中出现，也是我对该项目的第一个贡献，详见：<br><a href="https://github.com/nuxt/nuxt.js/pull/3629" target="_blank" rel="external">https://github.com/nuxt/nuxt.js/pull/3629</a></p>
+<p>在上例中，将loading设置为false，可以让加载组件进入网页时即开始工作，让编程人员可以选择手动停止它。当然，前提假设是它已经由前一个路由启动（不管是自动或通过start()手动启动）。也就是说，如果在网页上将loading设置为false，需要在导航到不同路由时手动调用start()来启动Nuxt的加载组件。</p>
+<p>我常使用的另一种模式，是用Nuxt加载组件的状态来更新Vuex store仓库。这种简单的方法可以用来更新需要可视化实现的特定UI部分。</p>
+<h2 id="从-Koa-的上下文传递数据"><a href="#从-Koa-的上下文传递数据" class="headerlink" title="从 Koa 的上下文传递数据"></a>从 Koa 的上下文传递数据</h2><p>我不再建议将Nuxt当做Koa中间件。我了解到，处理同类型工作，Nuxt的内置HTTP服务器比Koa强很多。如果在后端API和Nuxt应用代码（建议的方式）使用不同的处理，而且还想使用基于Node的API服务器，可以了解一下hapi、polka或micro。我们很快会发布基于连接的@nuxt/metal。</p>
+<p>使用Nuxt服务器中间件时，可以应用相同的方法，即设置要传递给中间件处理程序的req或res参数。</p>
+<h2 id="使用-Vuex-Store-工厂函数"><a href="#使用-Vuex-Store-工厂函数" class="headerlink" title="使用 Vuex Store 工厂函数"></a>使用 Vuex Store 工厂函数</h2><p>我已经完全不这样做了。现在Nuxt允许在state.js、actions.js和mutations.js 等单独的文件中拆分Vuex store模块。它能重组符合预期Vuex属性（包括 getters）的文件并用它们来构建一个store模块。这让代码结构变得更简单自然。</p>
+<p>可能，你可能想要检出unholy，它是我写的一个Nuxt模块，可以改变缺省 commit()行为来接收一个简单的参数，和root state结合紧密的一个对象。和 Vue核心团队关系密切的一个组织提到，会有类似功能添加到Vuex中。</p>
+<h2 id="用-extend-产生多余的文件"><a href="#用-extend-产生多余的文件" class="headerlink" title="用 extend() 产生多余的文件"></a>用 extend() 产生多余的文件</h2><p>我们最好使用build.templates配置选项。它们可以让我们添加一些列Nuxt模板文件（由lodash.template自动预处理）。你可以指定源，目标和带选项的对象（模板变量），取代writeFileSync()的手动方式，如下所示：</p>
+<h2 id="初始化全局客户端代码"><a href="#初始化全局客户端代码" class="headerlink" title="初始化全局客户端代码"></a>初始化全局客户端代码</h2><p>这里的方法有所改变。以前是使用的是我基于实体的方法，现在则使用客户端插件来添加一个onNuxtReady 处理程序。我通常从 src/ready 中导入，如下所示：</p>
+<p>你也可以在 ready.client.js 文件中加入上述代码，在 plugins 配置选项中将其列出。Nuxt 会明白这是一个只在客户端运行的插件，这样就不用每次都检查 process.client了。</p>
+<h2 id="Axiosq-请求拦截"><a href="#Axiosq-请求拦截" class="headerlink" title="Axiosq 请求拦截"></a>Axiosq 请求拦截</h2><p>本文结束前，需要指出，对于Nuxt应用程序，Nuxt: The Hard Parts、@nuxtjs/axios不再是推荐使用的HTTP客户端库。使用@nuxt/http的拦截API也类似，并保留了我的每个Nuxt项目中都会用到的一个特性。</p>
+<p>使用@nuxt/http拦截的主要区别在于，需要使用之前已有的config.headers 对象的set(key, value)方法，而不是简单地进行赋值。更新的例子如下：</p>
+<p>过去一年中，Nuxt有超过 20k+ GitHub的关注，现在已成长为9人的核心团队，并且有190个贡献者，陆续在发布补丁和小版本。它拥有活跃友好的社区，可以轻松地构建Vue.js Web应用程序，是最安全，最高效的选择之一。</p>
+<p>相关链接：</p>
+<p>Nuxt: The Hard Parts：<br><a href="https://hire.jonasgalvez.com.br/2019/apr/27/nuxt-the-hard-parts/" target="_blank" rel="external">https://hire.jonasgalvez.com.br/2019/apr/27/nuxt-the-hard-parts/</a><br>@nuxtjs/axios：<br><a href="https://axios.nuxtjs.org/" target="_blank" rel="external">https://axios.nuxtjs.org/</a><br>@nuxt/http：<br><a href="https://http.nuxtjs.org/" target="_blank" rel="external">https://http.nuxtjs.org/</a></p>
+<p>英文原文：<br><a href="https://vuejsdevelopers.com/2019/05/20/7-nuxt-tips-revisited/?utm_source=echojs&amp;utm_medium=article&amp;utm_campaign=7tr" target="_blank" rel="external">https://vuejsdevelopers.com/2019/05/20/7-nuxt-tips-revisited/?utm_source=echojs&amp;utm_medium=article&amp;utm_campaign=7tr</a></p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MzUxMzcxMzE5Ng==&amp;mid=2247491334&amp;idx=2&amp;sn=e24dd08678dba32611cc1bfe907e43c1&amp;chksm=f951aa45ce262353b46094cfc4cb5d4d314a09d1073b7b63648a5ccc4aef803aad4c592e2270&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MzUxMzcxMzE5Ng==&amp;mid=2247491334&amp;idx=2&amp;sn=e24dd08678dba32611cc1bfe907e43c1&amp;chksm=f951aa45ce262353b46094cfc4cb5d4d314a09d1073b7b63648a5ccc4aef803aad4c592e2270&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +79,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="7个Nuxt技巧：构建安全高效"
 >
   Tweet
 </a>

@@ -37,7 +37,38 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="谈谈StorageEvent"><a href="#谈谈StorageEvent" class="headerlink" title="谈谈StorageEvent"></a>谈谈StorageEvent</h1><p>我们在开发多Tab应用时候，常常会遇到多个Tab状态同步的问题。</p>
+<p>想象如下场景：用户主界面，显示用户购物车内待结算的商品总数。此时，用户可能打开多个Tab。当用户添加新商品到购物车的时候，需要更新购物车的数量。</p>
+<p>此时，当前页面需要向服务器发起请求，在得到添加成功响应的时候，可以更新用户界面。为了兼顾体验和可靠性，如果确信添加成功概率比较高的时候，也可以先更新界面，当多数返回错误的时候，可以给用户界面做状态回滚。为了下次展示方便，我们还会把这个数据写到LocalStorage里面。用户再次打开时候，可以优先从localStorage中取值。</p>
+<p>当前页面解决了，那么如果同时打开多个Tab该如何解决呢？这里使用StorageEvent可能是一种代价较小的解决方案。</p>
+<p>StorageEvent是什么呢？</p>
+<ol>
+<li><p>是一种Event，可以通过标准的Event监听器操作。</p>
+</li>
+<li><p>当storage变化时候，事件会被派发到所有同域下的其他页面。</p>
+</li>
+<li><p>触发变化的当前页面，没有事件派发。</p>
+</li>
+</ol>
+<p>这里有一个简单的示例可以展示这个API的用法。</p>
+<p>其中，下面这行代码是实现的关键：</p>
+<p>当我们注释掉这个语句，我们的页面同步就不能运行了。</p>
+<p>读者可以打开多个Tab并观察页面的变化 <a href="https://jsbin.com/radekilosu/1/edit?html,css,js,output" target="_blank" rel="external">https://jsbin.com/radekilosu/1/edit?html,css,js,output</a> 。</p>
+<p>实际上，这个事件e上还带有很多信息，方便编程时，对于事件做精确的控制。</p>
+<p>上述各值都是只读的。</p>
+<p>还有一点没有解决掉，就是触发storage变化的本页面，不能接收这个值，这个一般情况下是没问题。当然，为了一致性，我们可以自行new一个事件，在发生时候主动触发它。</p>
+<p>此时我们可以包装一个新的Storage对象：</p>
+<p>此时，我们再包装一个函数：</p>
+<p>此时，我们只需要再setItem、removeItem、clear中获取对应的值，并手动调用一dispatchMe，同时把和localStorage打交道的地方改为调用我们的新对象即可。</p>
+<p>参考资料</p>
+<ol>
+<li><p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event</a></p>
+</li>
+<li><p><a href="https://www.cnblogs.com/cczw/p/3196195.html" target="_blank" rel="external">https://www.cnblogs.com/cczw/p/3196195.html</a></p>
+</li>
+</ol>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MzA5NzkwNDk3MQ==&amp;mid=2650589816&amp;idx=1&amp;sn=129a63131c49b4bc7c3d6be3a7362a61&amp;chksm=8891da5cbfe6534a680bf040e8f3a917c69ed4a103c1af5063b1ddbe85b93023b7bf54d0db1b&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MzA5NzkwNDk3MQ==&amp;mid=2650589816&amp;idx=1&amp;sn=129a63131c49b4bc7c3d6be3a7362a61&amp;chksm=8891da5cbfe6534a680bf040e8f3a917c69ed4a103c1af5063b1ddbe85b93023b7bf54d0db1b&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=ZGo%2F09TJool89TZucvTs3f%2F2I6CgLHnxwnVDmw7rP60HsDsPBM9VP7OOsHvoe%2Foc#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +87,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="谈谈StorageEvent""
 >
   Tweet
 </a>
