@@ -37,7 +37,151 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="JavaScript手写代码"><a href="#JavaScript手写代码" class="headerlink" title="JavaScript手写代码"></a>JavaScript手写代码</h1><p>手写路径导航</p>
+<ul>
+<li><p>实现一个new操作符</p>
+</li>
+<li><p>实现一个JSON.stringify</p>
+</li>
+<li><p>实现一个JSON.parse</p>
+</li>
+<li><p>实现一个call或 apply</p>
+</li>
+<li><p>实现一个Function.bind</p>
+</li>
+<li><p>实现一个继承</p>
+</li>
+<li><p>实现一个JS函数柯里化</p>
+</li>
+<li><p>手写一个Promise(中高级必考)</p>
+</li>
+<li><p>手写防抖(Debouncing)和节流(Throttling)</p>
+</li>
+<li><p>手写一个JS深拷贝</p>
+</li>
+<li><p>实现一个instanceOf</p>
+</li>
+</ul>
+<h2 id="实现一个new操作符"><a href="#实现一个new操作符" class="headerlink" title="实现一个new操作符"></a>实现一个new操作符</h2><blockquote>
+<p>来源：「你不知道的javascript」 英文版</p>
+</blockquote>
+<p>new操作符做了这些事：</p>
+<ul>
+<li><p>它创建了一个全新的对象。</p>
+</li>
+<li><p>它会被执行 [[Prototype]]（也就是 <strong>proto</strong>）链接。</p>
+</li>
+<li><p>它使 this指向新创建的对象。。</p>
+</li>
+<li><p>通过 new创建的每个对象将最终被 [[Prototype]]链接到这个函数的 prototype对象上。</p>
+</li>
+<li><p>如果函数没有返回对象类型 Object(包含 Functoin,Array,Date,RegExg,Error)，那么 new表达式中的函数调用将返回该对象引用。</p>
+</li>
+</ul>
+<h2 id="实现一个JSON-stringify"><a href="#实现一个JSON-stringify" class="headerlink" title="实现一个JSON.stringify"></a>实现一个JSON.stringify</h2><blockquote>
+<p>JSON.stringify(value[,replacer[,space]])：</p>
+<ul>
+<li>Boolean|Number|String 类型会自动转换成对应的原始值。</li>
+<li>undefined、任意函数以及 symbol，会被忽略（出现在非数组对象的属性值中时），或者被转换成 null（出现在数组中时）。</li>
+<li>不可枚举的属性会被忽略</li>
+<li>如果一个对象的属性值通过某种间接的方式指回该对象本身，即循环引用，属性也会被忽略。</li>
+</ul>
+</blockquote>
+<h2 id="实现一个JSON-parse"><a href="#实现一个JSON-parse" class="headerlink" title="实现一个JSON.parse"></a>实现一个JSON.parse</h2><blockquote>
+<p>JSON.parse(text[,reviver])</p>
+</blockquote>
+<p>用来解析JSON字符串，构造由字符串描述的JavaScript值或对象。提供可选的reviver函数用以在返回之前对所得到的对象执行变换(操作)。</p>
+<h3 id="第一种：直接调用-eval"><a href="#第一种：直接调用-eval" class="headerlink" title="第一种：直接调用 eval"></a>第一种：直接调用 eval</h3><blockquote>
+<p>避免在不必要的情况下使用 eval，eval() 是一个危险的函数， 他执行的代码拥有着执行者的权利。如果你用 eval()运行的字符串代码被恶意方（不怀好意的人）操控修改，您最终可能会在您的网页/扩展程序的权限下，在用户计算机上运行恶意代码。</p>
+</blockquote>
+<p>它会执行JS代码，有XSS漏洞。</p>
+<p>如果你只想记这个方法，就得对参数json做校验。</p>
+<h3 id="第二种：Function"><a href="#第二种：Function" class="headerlink" title="第二种：Function"></a>第二种：Function</h3><blockquote>
+<p>来源 神奇的eval()与new Function()</p>
+</blockquote>
+<p>核心：Function与 eval有相同的字符串参数特性。</p>
+<blockquote>
+<p>varfunc=newFunction(arg1,arg2,…,functionBody);</p>
+</blockquote>
+<p>在转换JSON的实际应用中，只需要这么做。</p>
+<p>eval 与 Function 都有着动态编译js代码的作用，但是在实际的编程中并不推荐使用。</p>
+<p>这里是面向面试编程，写这两种就够了。至于第三，第四种，涉及到繁琐的递归和状态机相关原理，具体可以看：</p>
+<blockquote>
+<p>《JSON.parse 三种实现方式》</p>
+</blockquote>
+<h2 id="实现一个call或-apply"><a href="#实现一个call或-apply" class="headerlink" title="实现一个call或 apply"></a>实现一个call或 apply</h2><blockquote>
+<p>实现改编来源：JavaScript深入之call和apply的模拟实现 #11</p>
+</blockquote>
+<p>call语法：</p>
+<blockquote>
+<p>fun.call(thisArg,arg1,arg2,…)，调用一个函数, 其具有一个指定的this值和分别地提供的参数(参数的列表)。</p>
+</blockquote>
+<p>apply语法：</p>
+<blockquote>
+<p>func.apply(thisArg,[argsArray])，调用一个函数，以及作为一个数组（或类似数组对象）提供的参数。</p>
+</blockquote>
+<h3 id="Function-call按套路实现"><a href="#Function-call按套路实现" class="headerlink" title="Function.call按套路实现"></a>Function.call按套路实现</h3><p>call核心：</p>
+<ul>
+<li><p>将函数设为对象的属性</p>
+</li>
+<li><p>执行&amp;删除这个函数</p>
+</li>
+<li><p>指定 this到函数并传入给定参数执行函数</p>
+</li>
+<li><p>如果不传入参数，默认指向为 window</p>
+</li>
+</ul>
+<p>为啥说是套路实现呢？因为真实面试中，面试官很喜欢让你逐步地往深考虑，这时候你可以反套路他，先写个简单版的：</p>
+<h4 id="简单版"><a href="#简单版" class="headerlink" title="简单版"></a>简单版</h4><h4 id="完善版"><a href="#完善版" class="headerlink" title="完善版"></a>完善版</h4><p>当面试官有进一步的发问，或者此时你可以假装思考一下。然后写出以下版本：</p>
+<h3 id="Function-apply的模拟实现"><a href="#Function-apply的模拟实现" class="headerlink" title="Function.apply的模拟实现"></a>Function.apply的模拟实现</h3><p>apply()的实现和 call()类似，只是参数形式不同。直接贴代码吧：</p>
+<h2 id="实现一个Function-bind"><a href="#实现一个Function-bind" class="headerlink" title="实现一个Function.bind()"></a>实现一个Function.bind()</h2><p>bind()方法:</p>
+<blockquote>
+<p>会创建一个新函数。当这个新函数被调用时，bind() 的第一个参数将作为它运行时的 this，之后的一序列参数将会在传递的实参前传入作为它的参数。(来自于 MDN )</p>
+</blockquote>
+<p>此外， bind实现需要考虑实例化后对原型链的影响。</p>
+<h2 id="实现一个继承"><a href="#实现一个继承" class="headerlink" title="实现一个继承"></a>实现一个继承</h2><p>寄生组合式继承</p>
+<p>一般只建议写这种，因为其它方式的继承会在一次实例中调用两次父类的构造函数或有其它缺点。</p>
+<p>核心实现是：用一个 F 空的构造函数去取代执行了 Parent 这个构造函数。</p>
+<h2 id="实现一个JS函数柯里化"><a href="#实现一个JS函数柯里化" class="headerlink" title="实现一个JS函数柯里化"></a>实现一个JS函数柯里化</h2><p>什么是柯里化？</p>
+<blockquote>
+<p>在计算机科学中，柯里化（Currying）是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数且返回结果的新函数的技术。</p>
+</blockquote>
+<p>函数柯里化的主要作用和特点就是参数复用、提前返回和延迟执行。</p>
+<h3 id="通用版"><a href="#通用版" class="headerlink" title="通用版"></a>通用版</h3><h3 id="ES6写法"><a href="#ES6写法" class="headerlink" title="ES6写法"></a>ES6写法</h3><h2 id="手写一个Promise"><a href="#手写一个Promise" class="headerlink" title="手写一个Promise"></a>手写一个Promise</h2><p>我们来过一遍 Promise/A+规范：</p>
+<ul>
+<li><p>三种状态 pending|fulfilled(resolved)|rejected</p>
+</li>
+<li><p>当处于 pending状态的时候，可以转移到 fulfilled(resolved)或者 rejected状态</p>
+</li>
+<li><p>当处于 fulfilled(resolved)状态或者 rejected状态的时候，就不可变。</p>
+</li>
+<li><p>必须有一个 then异步执行方法， then接受两个参数且必须返回一个promise：</p>
+</li>
+</ul>
+<h3 id="Promise的流程图分析"><a href="#Promise的流程图分析" class="headerlink" title="Promise的流程图分析"></a>Promise的流程图分析</h3><p>来回顾下 Promise用法：</p>
+<h3 id="够用版"><a href="#够用版" class="headerlink" title="够用版"></a>够用版</h3><blockquote>
+<p>来源：实现一个完美符合Promise/A+规范的Promise</p>
+</blockquote>
+<p>同时，需要在 myPromise的原型上定义链式调用的 then方法：</p>
+<p>测试一下：</p>
+<h3 id="专供版"><a href="#专供版" class="headerlink" title="专供版"></a>专供版</h3><p>直接贴出来吧，这个版本还算好理解</p>
+<h2 id="手写防抖-Debouncing-和节流-Throttling"><a href="#手写防抖-Debouncing-和节流-Throttling" class="headerlink" title="手写防抖(Debouncing)和节流(Throttling)"></a>手写防抖(Debouncing)和节流(Throttling)</h2><blockquote>
+<p>scroll 事件本身会触发页面的重新渲染，同时 scroll 事件的 handler 又会被高频度的触发, 因此事件的 handler 内部不应该有复杂操作，例如 DOM 操作就不应该放在事件处理中。针对此类高频度触发事件问题（例如页面 scroll ，屏幕 resize，监听用户输入等），有两种常用的解决方法，防抖和节流。</p>
+</blockquote>
+<h3 id="防抖-Debouncing-实现"><a href="#防抖-Debouncing-实现" class="headerlink" title="防抖(Debouncing)实现"></a>防抖(Debouncing)实现</h3><p>典型例子：限制 鼠标连击 触发。</p>
+<p>一个比较好的解释是：</p>
+<blockquote>
+<p>当一次事件发生后，事件处理器要等一定阈值的时间，如果这段时间过去后 再也没有 事件发生，就处理最后一次发生的事件。假设还差 0.01 秒就到达指定时间，这时又来了一个事件，那么之前的等待作废，需要重新再等待指定时间。</p>
+</blockquote>
+<p>结合实例：滚动防抖</p>
+<h3 id="节流-Throttling-实现"><a href="#节流-Throttling-实现" class="headerlink" title="节流(Throttling)实现"></a>节流(Throttling)实现</h3><blockquote>
+<p>可以理解为事件在一个管道中传输，加上这个节流阀以后，事件的流速就会减慢。实际上这个函数的作用就是如此，它可以将一个函数的调用频率限制在一定阈值内，例如 1s，那么 1s 内这个函数一定不会被调用两次</p>
+</blockquote>
+<p>简单的节流函数:</p>
+<h3 id="结合实践"><a href="#结合实践" class="headerlink" title="结合实践"></a>结合实践</h3><p>通过第三个参数来切换模式。</p>
+<h2 id="手写一个JS深拷贝"><a href="#手写一个JS深拷贝" class="headerlink" title="手写一个JS深拷贝"></a>手写一个JS深拷贝</h2><p>有个最著名的乞丐版实现，在《你不知道的JavaScript（上）》里也有提及：</p>
+<h3 id="乞丐版"><a href="#乞丐版" class="headerlink" title="乞丐版"></a>乞丐版</h3><h3 id="够用版-1"><a href="#够用版-1" class="headerlink" title="够用版"></a>够用版</h3><h2 id="实现一个instanceOf"><a href="#实现一个instanceOf" class="headerlink" title="实现一个instanceOf"></a>实现一个instanceOf</h2><p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=Mzg5ODA5NTM1Mw==&amp;mid=2247483859&amp;idx=1&amp;sn=9b9acd9c0ffdd5a631b4e850c5c4b8f3&amp;chksm=c0668045f7110953998240b5072552c824d91a1b55c6ee401688e951070d6cf11b31a7880854&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=bMFWZJB%2BJt2R8kmf61pHe1K4QwFR7JugP27jgp2t%2Bh7xlAOLRab1mNredCL%2FL24c#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=Mzg5ODA5NTM1Mw==&amp;mid=2247483859&amp;idx=1&amp;sn=9b9acd9c0ffdd5a631b4e850c5c4b8f3&amp;chksm=c0668045f7110953998240b5072552c824d91a1b55c6ee401688e951070d6cf11b31a7880854&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=bMFWZJB%2BJt2R8kmf61pHe1K4QwFR7JugP27jgp2t%2Bh7xlAOLRab1mNredCL%2FL24c#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +200,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="JavaScript手写代码""
 >
   Tweet
 </a>

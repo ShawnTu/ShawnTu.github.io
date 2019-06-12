@@ -37,7 +37,325 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="全面分析前端的网络请求"><a href="#全面分析前端的网络请求" class="headerlink" title="全面分析前端的网络请求"></a>全面分析前端的网络请求</h1><h2 id="前端进行网络请求的关注点"><a href="#前端进行网络请求的关注点" class="headerlink" title="前端进行网络请求的关注点"></a>前端进行网络请求的关注点</h2><p>大多数情况下，在前端发起一个网络请求我们只需关注下面几点：</p>
+<ul>
+<li><p>传入基本参数（ url，请求方式）</p>
+</li>
+<li><p>请求参数、请求参数类型</p>
+</li>
+<li><p>设置请求头</p>
+</li>
+<li><p>获取响应的方式</p>
+</li>
+<li><p>获取响应头、响应状态、响应结果</p>
+</li>
+<li><p>异常处理</p>
+</li>
+<li><p>携带 cookie设置</p>
+</li>
+<li><p>跨域请求</p>
+</li>
+</ul>
+<h2 id="前端进行网络请求的方式"><a href="#前端进行网络请求的方式" class="headerlink" title="前端进行网络请求的方式"></a>前端进行网络请求的方式</h2><ul>
+<li><p>form表单、 ifream、刷新页面</p>
+</li>
+<li><p>Ajax - 异步网络请求的开山鼻祖</p>
+</li>
+<li><p>jQuery - 一个时代</p>
+</li>
+<li><p>fetch - Ajax的替代者</p>
+</li>
+<li><p>axios、request等众多开源库</p>
+</li>
+</ul>
+<h2 id="关于网络请求的疑问"><a href="#关于网络请求的疑问" class="headerlink" title="关于网络请求的疑问"></a>关于网络请求的疑问</h2><ul>
+<li><p>Ajax的出现解决了什么问题</p>
+</li>
+<li><p>原生 Ajax如何使用</p>
+</li>
+<li><p>jQuery的网络请求方式</p>
+</li>
+<li><p>fetch的用法以及坑点</p>
+</li>
+<li><p>如何正确的使用 fetch</p>
+</li>
+<li><p>如何选择合适的跨域方式</p>
+</li>
+</ul>
+<p>带着以上这些问题、关注点我们对几种网络请求进行一次全面的分析。</p>
+<h2 id="Ajax的出现解决了什么问题"><a href="#Ajax的出现解决了什么问题" class="headerlink" title="Ajax的出现解决了什么问题"></a>Ajax的出现解决了什么问题</h2><p>在 Ajax出现之前， web程序是这样工作的：</p>
+<p>这种交互的的缺陷是显而易见的，任何和服务器的交互都需要刷新页面，用户体验非常差， Ajax的出现解决了这个问题。 Ajax全称 AsynchronousJavaScript+XML（异步 JavaScript和 XML）</p>
+<p>使用 Ajax，网页应用能够快速地将增量更新呈现在用户界面上，而不需要重载（刷新）整个页面。</p>
+<p>Ajax本身不是一种新技术，而是用来描述一种使用现有技术集合实现的一个技术方案，浏览器的 XMLHttpRequest是实现 Ajax最重要的对象（ IE6以下使用 ActiveXObject）。</p>
+<p>尽管 X在 Ajax中代表 XML, 但由于 JSON的许多优势，比如更加轻量以及作为 Javascript的一部分，目前 JSON的使用比 XML更加普遍。</p>
+<h2 id="原生Ajax的用法"><a href="#原生Ajax的用法" class="headerlink" title="原生Ajax的用法"></a>原生Ajax的用法</h2><p>这里主要分析 XMLHttpRequest对象，下面是它的一段基础使用：</p>
+<p>下面分别对 XMLHttpRequest对象常用的的函数、属性、事件进行分析。</p>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><p>open</p>
+<p>用于初始化一个请求，用法：</p>
+<p>send</p>
+<p>用于发送 HTTP请求，即调用该方法后 HTTP请求才会被真正发出，用法：</p>
+<p>abort</p>
+<p>用于终止一个 ajax请求，调用此方法后 readyState将被设置为 0，用法：</p>
+<p>setRequestHeader</p>
+<p>用于设置 HTTP请求头，此方法必须在 open()方法和 send()之间调用，用法：</p>
+<p>getResponseHeader</p>
+<p>用于获取 http返回头，如果在返回头中有多个一样的名称，那么返回的值就会是用逗号和空格将值分隔的字符串，用法：</p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>readyState</p>
+<p>用来标识当前 XMLHttpRequest对象所处的状态， XMLHttpRequest对象总是位于下列状态中的一个：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>状态</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>UNSENT</td>
+<td>代理被创建，但尚未调用 open() 方法。</td>
+</tr>
+<tr>
+<td>1</td>
+<td>OPENED</td>
+<td>open() 方法已经被调用。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>HEADERS_RECEIVED</td>
+<td>send()方法已经被调用，并且头部和状态已经可获得。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>LOADING</td>
+<td>下载中； responseText 属性已经包含部分数据。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>DONE</td>
+<td>下载操作已完成。</td>
+</tr>
+</tbody>
+</table>
+<p>status</p>
+<p>表示 http请求的状态, 初始值为 0。如果服务器没有显式地指定状态码, 那么 status将被设置为默认值, 即 200。</p>
+<p>responseType</p>
+<p>表示响应的数据类型，并允许我们手动设置，如果为空，默认为 text类型，可以有下面的取值：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“”</td>
+<td>将 responseType设为空字符串与设置为 “text”相同， 是默认类型 （实际上是 DOMString）。</td>
+</tr>
+<tr>
+<td>“arraybuffer”</td>
+<td>response 是一个包含二进制数据的 JavaScriptArrayBuffer 。</td>
+</tr>
+<tr>
+<td>“blob”</td>
+<td>response是一个包含二进制数据的 Blob 对象 。</td>
+</tr>
+<tr>
+<td>“document”</td>
+<td>response 是一个 HTMLDocument或 XMLXMLDocument，这取决于接收到的数据的 MIME 类型。</td>
+</tr>
+<tr>
+<td>“json”</td>
+<td>response 是一个 JavaScript 对象。这个对象是通过将接收到的数据类型视为 JSON解析得到的。</td>
+</tr>
+<tr>
+<td>“text”</td>
+<td>response是包含在 DOMString对象中的文本。</td>
+</tr>
+</tbody>
+</table>
+<p>response</p>
+<p>返回响应的正文，返回的类型由上面的 responseType决定。</p>
+<p>withCredentials</p>
+<p>ajax请求默认会携带同源请求的 cookie，而跨域请求则不会携带 cookie，设置 xhr的 withCredentials的属性为 true将允许携带跨域 cookie。</p>
+<h3 id="事件回调"><a href="#事件回调" class="headerlink" title="事件回调"></a>事件回调</h3><p>onreadystatechange</p>
+<p>当 readyState属性发生变化时，callback会被触发。</p>
+<p>onloadstart</p>
+<p>在 ajax请求发送之前（ readyState==1后, readyState==2前）， callback会被触发。</p>
+<p>onprogress</p>
+<p>回调函数可以获取资源总大小 total，已经加载的资源大小 loaded，用这两个值可以计算加载进度。</p>
+<p>onload</p>
+<p>当一个资源及其依赖资源已完成加载时，将触发 callback，通常我们会在 onload事件中处理返回值。</p>
+<h3 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h3><p>onerror</p>
+<p>当 ajax资源加载失败时会触发 callback。</p>
+<p>ontimeout</p>
+<p>当进度由于预定时间到期而终止时，会触发 callback，超时时间可使用 timeout属性进行设置。</p>
+<h2 id="jQuery对Ajax的封装"><a href="#jQuery对Ajax的封装" class="headerlink" title="jQuery对Ajax的封装"></a>jQuery对Ajax的封装</h2><p>在很长一段时间里，人们使用 jQuery提供的 ajax封装进行网络请求，包括 $.ajax、$.get、$.post等，这几个方法放到现在，我依然觉得很实用。</p>
+<p>$.ajax只接收一个参数，这个参数接收一系列配置，其自己封装了一个 jqXHR对象，有兴趣可以阅读一下jQuary-ajax 源码</p>
+<p>常用配置：</p>
+<p>url</p>
+<p>当前页地址。发送请求的地址。</p>
+<p>type</p>
+<p>类型： String 请求方式 ( “POST” 或 “GET”)， 默认为 “GET”。注意：其它 HTTP请求方法，如 PUT和 DELETE也可以使用，但仅部分浏览器支持。</p>
+<p>timeout</p>
+<p>类型： Number设置请求超时时间（毫秒）。此设置将覆盖全局设置。</p>
+<p>success</p>
+<p>类型： Function 请求成功后的回调函数。</p>
+<p>jsonp</p>
+<p>在一个 jsonp请求中重写回调函数的名字。这个值用来替代在 “callback=?”这种 GET或 POST请求中 URL参数里的 “callback”部分。</p>
+<p>error 类型： Function 。请求失败时调用此函数。</p>
+<p>注意：源码里对错误的判定：</p>
+<p>返回值除了这几个状态码都会进 error回调。</p>
+<p>dataType</p>
+<p>data</p>
+<p>类型： String 使用 JSON.stringify转码</p>
+<p>complete</p>
+<p>类型： Function请求完成后回调函数 (请求成功或失败之后均调用)。</p>
+<p>async</p>
+<p>类型： Boolean 默认值: true。默认设置下，所有请求均为异步请求。如果需要发送同步请求，请将此选项设置为 false。</p>
+<p>contentType</p>
+<p>类型： String默认值: “application/x-www-form-urlencoded”。发送信息至服务器时内容编码类型。</p>
+<p>键值对这样组织在一般的情况下是没有什么问题的，这里说的一般是，不带嵌套类型 JSON，也就是 简单的 JSON，形如这样：</p>
+<p>但是在一些复杂的情况下就有问题了。 例如在 Ajax中你要传一个复杂的 json 对像，也就说是对象嵌数组，数组中包括对象，你这样传： application/x-www-form-urlencoded 这种形式是没有办法将复杂的 JSON组织成键值对形式。</p>
+<p>可以用如下方式传递复杂的 json对象</p>
+<h2 id="jQuery的替代者"><a href="#jQuery的替代者" class="headerlink" title="jQuery的替代者"></a>jQuery的替代者</h2><p>近年来前端 MV*的发展壮大，人们越来越少的使用 jQuery，我们不可能单独为了使用 jQuery的 Ajaxapi来单独引入他，无可避免的，我们需要寻找新的技术方案。</p>
+<p>尤雨溪在他的文档中推荐大家用 axios进行网络请求。 axios基于 Promise对原生的 XHR进行了非常全面的封装，使用方式也非常的优雅。另外， axios同样提供了在 node环境下的支持，可谓是网络请求的首选方案。</p>
+<p>未来必定还会出现更优秀的封装，他们有非常周全的考虑以及详细的文档，这里我们不多做考究，我们把关注的重点放在更底层的API fetch。</p>
+<p>FetchAPI是一个用用于访问和操纵HTTP管道的强大的原生 API。</p>
+<blockquote>
+<p>这种功能以前是使用 XMLHttpRequest实现的。Fetch提供了一个更好的替代方法，可以很容易地被其他技术使用，例如 Service Workers。Fetch还提供了单个逻辑位置来定义其他HTTP相关概念，例如CORS和HTTP的扩展。</p>
+</blockquote>
+<p>可见 fetch是作为 XMLHttpRequest的替代品出现的。</p>
+<p>使用 fetch，你不需要再额外加载一个外部资源。但它还没有被浏览器完全支持，所以你仍然需要一个 polyfill。</p>
+<h2 id="fetch的使用"><a href="#fetch的使用" class="headerlink" title="fetch的使用"></a>fetch的使用</h2><p>一个基本的 fetch请求：</p>
+<p>FetchAPI提供了一个全局的 fetch()方法，以及几个辅助对象来发起一个网络请求。</p>
+<ul>
+<li>fetch()</li>
+</ul>
+<p>fetch()方法用于发起获取资源的请求。它返回一个 promise，这个 promise 会在请求响应后被 resolve，并传回 Response 对象。</p>
+<ul>
+<li>Headers</li>
+</ul>
+<p>可以通过 Headers()构造函数来创建一个你自己的 headers对象，相当于 response/request 的头信息，可以使你查询到这些头信息，或者针对不同的结果做不同的操作。</p>
+<ul>
+<li>Request</li>
+</ul>
+<p>通过 Request()构造函数可以创建一个 Request对象，这个对象可以作为 fetch函数的第二个参数。</p>
+<ul>
+<li>Response</li>
+</ul>
+<p>在 fetch()处理完 promises之后返回一个 Response实例，也可以手动创建一个 Response实例。</p>
+<h2 id="fetch-polyfill源码分析"><a href="#fetch-polyfill源码分析" class="headerlink" title="fetch polyfill源码分析"></a>fetch polyfill源码分析</h2><p>由于 fetch是一个非常底层的 API，所以我们无法进一步的探究它的底层，但是我们可以借助它的 polyfill探究它的基本原理，并找出其中的坑点。</p>
+<h3 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h3><p>由代码可见， polyfill主要对 Fetch API提供的四大对象进行了封装：</p>
+<h3 id="fetch-封装"><a href="#fetch-封装" class="headerlink" title="fetch 封装"></a>fetch 封装</h3><p>代码非常清晰：</p>
+<ul>
+<li><p>构造一个 Promise对象并返回</p>
+</li>
+<li><p>创建一个 Request对象</p>
+</li>
+<li><p>创建一个 XMLHttpRequest对象</p>
+</li>
+<li><p>取出 Request对象中的请求 url，请求方发， open一个 xhr请求，并将 Request对象中存储的 headers取出赋给xhr</p>
+</li>
+<li><p>xhr onload后取出 response的 status、 headers、 body封装 Response对象，调用 resolve。</p>
+</li>
+</ul>
+<h3 id="异常处理-1"><a href="#异常处理-1" class="headerlink" title="异常处理"></a>异常处理</h3><p>可以发现，调用 reject有三种可能：</p>
+<ol>
+<li><p>请求超时</p>
+</li>
+<li><p>请求失败</p>
+</li>
+</ol>
+<p>注意：当和服务器建立简介，并收到服务器的异常状态码如 404、500等并不能触发 onerror。当网络故障时或请求被阻止时，才会标记为 reject，如跨域、 url不存在，网络异常等会触发 onerror。</p>
+<p>所以使用fetch当接收到异常状态码都是会进入then而不是catch。这些错误请求往往要手动处理。</p>
+<ol>
+<li>手动终止</li>
+</ol>
+<p>可以在 request参数中传入 signal对象，并对 signal对象添加 abort事件监听，当 xhr.readyState变为 4（响应内容解析完成）后将signal对象的abort事件监听移除掉。</p>
+<p>这表示，在一个 fetch请求结束之前可以调用 signal.abort将其终止。在浏览器中可以使用 AbortController()构造函数创建一个控制器，然后使用 AbortController.signal属性</p>
+<blockquote>
+<p>这是一个实验中的功能，此功能某些浏览器尚在开发中</p>
+</blockquote>
+<h3 id="Headers封装"><a href="#Headers封装" class="headerlink" title="Headers封装"></a>Headers封装</h3><p>在header对象中维护了一个 map对象，构造函数中可以传入 Header对象、数组、普通对象类型的 header，并将所有的值维护到 map中。</p>
+<p>之前在 fetch函数中看到调用了 header的 forEach方法，下面是它的实现：</p>
+<p>可见 header的遍历即其内部 map的遍历。</p>
+<p>另外 Header还提供了 append、delete、get、set等方法，都是对其内部的 map对象进行操作。</p>
+<h3 id="Request对象"><a href="#Request对象" class="headerlink" title="Request对象"></a>Request对象</h3><p>Request对象接收的两个参数即 fetch函数接收的两个参数，第一个参数可以直接传递 url，也可以传递一个构造好的 request对象。第二个参数即控制不同配置的 option对象。</p>
+<p>可以传入 credentials、headers、method、mode、signal、referrer等属性。</p>
+<p>这里注意：</p>
+<ul>
+<li>传入的 headers被当作 Headers构造函数的参数来构造header对象。</li>
+</ul>
+<h3 id="cookie处理"><a href="#cookie处理" class="headerlink" title="cookie处理"></a>cookie处理</h3><p>fetch函数中还有如下的代码：</p>
+<p>默认的 credentials类型为 same-origin,即可携带同源请求的coodkie。</p>
+<p>然后我发现这里polyfill的实现和MDN-使用Fetch以及很多资料是不一致的：</p>
+<blockquote>
+<p>mdn: 默认情况下，fetch 不会从服务端发送或接收任何 cookies</p>
+</blockquote>
+<p>于是我分别实验了下使用 polyfill和使用原生 fetch携带cookie的情况，发现在不设置 credentials的情况下居然都是默认携带同源 cookie的，这和文档的说明说不一致的，查阅了许多资料后都是说 fetch默认不会携带cookie，下面是使用原生 fetch在浏览器进行请求的情况：</p>
+<p>然后我发现在MDN-Fetch-Request已经指出新版浏览器 credentials默认值已更改为 same-origin，旧版依然是 omit。</p>
+<p>确实MDN-使用Fetch这里的文档更新的有些不及时，误人子弟了…</p>
+<h3 id="Response对象"><a href="#Response对象" class="headerlink" title="Response对象"></a>Response对象</h3><p>Response对象是 fetch调用成功后的返回值：</p>
+<p>回顾下 fetch 中对Response`的操作：</p>
+<p>Response构造函数：</p>
+<p>可见在构造函数中主要对 options中的 status、statusText、headers、url等分别做了处理并挂载到 Response对象上。</p>
+<p>构造函数里面并没有对 responseText的明确处理，最后交给了 _initBody函数处理，而 Response并没有主动声明 _initBody属性，代码最后使用 Response调用了 Body函数，实际上 _initBody函数是通过 Body函数挂载到 Response身上的，先来看看 _initBody函数：</p>
+<p>可见， _initBody函数根据 xhr.response的类型（ Blob、FormData、String…），为不同的参数进行赋值，这些参数在 Body方法中得到不同的应用，下面具体看看 Body函数还做了哪些其他的操作：</p>
+<p>Body函数中还为 Response对象挂载了四个函数， text、json、blob、formData，这些函数中的操作就是将_initBody中得到的不同类型的返回值返回。</p>
+<p>这也说明了，在 fetch执行完毕后，不能直接在 response中获取到返回值而必须调用 text()、json()等函数才能获取到返回值。</p>
+<p>这里还有一点需要说明：几个函数中都有类似下面的逻辑：</p>
+<p>consumed函数：</p>
+<p>每次调用 text()、json()等函数后会将 bodyUsed变量变为 true，用来标识返回值已经读取过了，下一次再读取直接抛出 TypeError(‘Already read’)。这也遵循了原生 fetch的原则：</p>
+<blockquote>
+<p>因为Responses对象被设置为了 stream 的方式，所以它们只能被读取一次</p>
+</blockquote>
+<h2 id="fetch的坑点"><a href="#fetch的坑点" class="headerlink" title="fetch的坑点"></a>fetch的坑点</h2><p>VUE的文档中对 fetch有下面的描述：</p>
+<blockquote>
+<p>使用 fetch还有很多别的注意事项，这也是为什么大家现阶段还是更喜欢 axios 多一些。当然这个事情在未来可能会发生改变。</p>
+</blockquote>
+<p>由于 fetch是一个非常底层的 API，它并没有被进行很多封装，还有许多问题需要处理：</p>
+<ul>
+<li><p>不能直接传递 JavaScript对象作为参数</p>
+</li>
+<li><p>需要自己判断返回值类型，并执行响应获取返回值的方法</p>
+</li>
+<li><p>获取返回值方法只能调用一次，不能多次调用</p>
+</li>
+<li><p>无法正常的捕获异常</p>
+</li>
+<li><p>老版浏览器不会默认携带 cookie</p>
+</li>
+<li><p>不支持 jsonp</p>
+</li>
+</ul>
+<h2 id="对fetch的封装"><a href="#对fetch的封装" class="headerlink" title="对fetch的封装"></a>对fetch的封装</h2><h3 id="请求参数处理"><a href="#请求参数处理" class="headerlink" title="请求参数处理"></a>请求参数处理</h3><p>支持传入不同的参数类型：</p>
+<h3 id="cookie携带"><a href="#cookie携带" class="headerlink" title="cookie携带"></a>cookie携带</h3><p>fetch在新版浏览器已经开始默认携带同源 cookie，但在老版浏览器中不会默认携带，我们需要对他进行统一设置：</p>
+<h3 id="异常处理-2"><a href="#异常处理-2" class="headerlink" title="异常处理"></a>异常处理</h3><blockquote>
+<p>当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP 响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的 ok 属性设置为 false ），仅当网络故障时或请求被阻止时，才会标记为 reject。</p>
+</blockquote>
+<p>因此我们要对 fetch的异常进行统一处理</p>
+<h3 id="返回值处理"><a href="#返回值处理" class="headerlink" title="返回值处理"></a>返回值处理</h3><p>对不同的返回值类型调用不同的函数接收，这里必须提前判断好类型，不能多次调用获取返回值的方法：</p>
+<h3 id="jsonp"><a href="#jsonp" class="headerlink" title="jsonp"></a>jsonp</h3><p>fetch本身没有提供对 jsonp的支持， jsonp本身也不属于一种非常好的解决跨域的方式，推荐使用 cors或者 nginx解决跨域，具体请看下面的章节。</p>
+<p>fetch封装好了，可以愉快的使用了。</p>
+<p>嗯，axios真好用…</p>
+<h2 id="跨域总结"><a href="#跨域总结" class="headerlink" title="跨域总结"></a>跨域总结</h2><p>谈到网络请求，就不得不提跨域。</p>
+<p>浏览器的同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。通常不允许不同源间的读操作。</p>
+<p>跨域条件：协议，域名，端口，有一个不同就算跨域。</p>
+<p>下面是解决跨域的几种方式：</p>
+<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><p>使用 nginx反向代理实现跨域，参考我这篇文章：前端开发者必备的nginx知识</p>
+<h3 id="cors"><a href="#cors" class="headerlink" title="cors"></a>cors</h3><p>CORS是一个 W3C标准，全称是”跨域资源共享” （Cross-origin resource sharing）。它允许浏览器向跨源服务器，发出 XMLHttpRequest请求。</p>
+<p>服务端设置 Access-Control-Allow-Origin就可以开启 CORS。 该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。</p>
+<h3 id="jsonp-1"><a href="#jsonp-1" class="headerlink" title="jsonp"></a>jsonp</h3><p>script标签的 src属性中的链接可以访问跨域的 js脚本，利用这个特性，服务端不再返回 JSON格式的数据，而是返回一段调用某个函数的 js代码，在 src中进行了调用，这样实现了跨域。</p>
+<p>jquery对 jsonp的支持：</p>
+<p>fetch、axios等并没有直接提供对 jsonp的支持，如果需要使用这种方式，我们可以尝试进行手动封装：</p>
+<h3 id="postMessage跨域"><a href="#postMessage跨域" class="headerlink" title="postMessage跨域"></a>postMessage跨域</h3><p>postMessage()方法允许来自不同源的脚本采用异步方式进行有限的通信，可以实现跨文本档、多窗口、跨域消息传递。</p>
+<p>postMessage跨域适用于以下场景：同浏览器多窗口间跨域通信、 iframe间跨域通信。</p>
+<h3 id="WebSocket"><a href="#WebSocket" class="headerlink" title="WebSocket"></a>WebSocket</h3><p>WebSocket 是一种双向通信协议，在建立连接之后， WebSocket的 server与 client都能主动向对方发送或接收数据而不受同源策略的限制。</p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=Mzg5ODA5NTM1Mw==&amp;mid=2247483936&amp;idx=1&amp;sn=26adbf4632ea8c9dfeb7e7a1b883fa30&amp;chksm=c06683b6f7110aa0d89cc76f81bbf0f43d2f0b69c707a56d3051cbf0f4e4f12e9248c3a02e22&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=bMFWZJB%2BJt2R8kmf61pHe1K4QwFR7JugP27jgp2t%2Bh7xlAOLRab1mNredCL%2FL24c#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=Mzg5ODA5NTM1Mw==&amp;mid=2247483936&amp;idx=1&amp;sn=26adbf4632ea8c9dfeb7e7a1b883fa30&amp;chksm=c06683b6f7110aa0d89cc76f81bbf0f43d2f0b69c707a56d3051cbf0f4e4f12e9248c3a02e22&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=bMFWZJB%2BJt2R8kmf61pHe1K4QwFR7JugP27jgp2t%2Bh7xlAOLRab1mNredCL%2FL24c#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +374,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="全面分析前端的网络请求"><a"
 >
   Tweet
 </a>
