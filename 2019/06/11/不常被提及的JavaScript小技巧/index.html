@@ -37,7 +37,46 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="不常被提及的JavaScript小技巧"><a href="#不常被提及的JavaScript小技巧" class="headerlink" title="不常被提及的JavaScript小技巧"></a>不常被提及的JavaScript小技巧</h1><p>有一些在日常工作中经常出现却容易被忽略的JavaScript小技巧，作者从中选取了11个教程中不常被提及的案例，供大家一起学习！</p>
+<h2 id="1、过滤唯一值"><a href="#1、过滤唯一值" class="headerlink" title="1、过滤唯一值"></a>1、过滤唯一值</h2><p>Set类型是在ES6中新增的，它类似于数组，但是成员的值都是唯一的，没有重复的值。结合扩展运算符（…）我们可以创建一个新的数组，达到过滤原数组重复值的功能。</p>
+<p>在ES6之前，我们如果想要实现这个功能的话，需要的处理代码要多很多。这个技巧的适用范围是数组中的数值的类型为：undefined， null， boolean， string， number。当包涵object， function， array时，则不适用。</p>
+<h2 id="2、短路求值（Short-Circuit-Evaluation）"><a href="#2、短路求值（Short-Circuit-Evaluation）" class="headerlink" title="2、短路求值（Short-Circuit Evaluation）"></a>2、短路求值（Short-Circuit Evaluation）</h2><p>三目运算符是一个很方便快捷的书写一些简单的逻辑语句的方式，</p>
+<p>但是有些时候当逻辑复杂之后，三目运算符书写起来可读性也会很难。这个时候，我们就可以使用逻辑与（&amp;&amp;）和逻辑或（||）运算符来改写我们的表达式。</p>
+<p>逻辑与和逻辑或操作符总是先计算其做操作数，只有在仅靠左操作数的值无法确定该逻辑表达式的结果时，才会求解其右操作数。这被称为“短路求值（Short-Circuit Evaluation）”</p>
+<p>工作原理<br>与（&amp;&amp;）运算符将会返回第一个false/‘falsy’的值。当所有的操作数都是true时，将返回最后一个表达式的结果。</p>
+<p>或（||）运算符将返回第一个true/‘truthy’的值。当所有的操作数都是false时，将返回最后一个表达式的结果。</p>
+<p>场景举例<br>当我们从服务器端请求数据的过程中，我们在另一个位置来使用这个数据，但是获取数据的状态并不知道，如我们访问this.state的data属性。按照常规的方式我们会先去判断这个this.state.data的有效性，之后根据有效性情况分别进行区分处理。</p>
+<p>但是我们可以通过上面的方式来简写这个逻辑处理。</p>
+<p>对比发现这个方式更加的简洁方便。</p>
+<h2 id="3、转换Boolean型"><a href="#3、转换Boolean型" class="headerlink" title="3、转换Boolean型"></a>3、转换Boolean型</h2><p>常规的boolean型值只有 true 和 false，但是在JavaScript中我们可以将其他的值认为是 ‘truthy’ 或者 ‘falsy’的。</p>
+<p>除了0， “”， null， undefined， NaN 和 false,其他的我们都可以认为是‘truthy’的。</p>
+<p>我们可以通过负运算符！将一系列的变量转换成“boolean”型。</p>
+<h2 id="4、转换String型"><a href="#4、转换String型" class="headerlink" title="4、转换String型"></a>4、转换String型</h2><p>我们可以通过+连接运算符将一个number类型的变量转换成string类型。</p>
+<h2 id="5、转换Number类型"><a href="#5、转换Number类型" class="headerlink" title="5、转换Number类型"></a>5、转换Number类型</h2><p>和上面对应的，我们可以通过加法运算符+将一个string类型的变量转回为number 类型的。</p>
+<p>在某些上下文中，+将被解释为连接操作符，而不是加法操作符。当这种情况发生时(您希望返回一个整数，而不是浮点数)，您可以使用两个波浪号:~~。(需要注意为英文格式)</p>
+<p>一个波浪号~，被称为“按位不运算符”，等价于 - n - 1。所以~15 = -16.</p>
+<p>使用两个~~可以有效的否定运算。这是因为 - (- n - 1) - 1 = n + 1 - 1 = n。也就是说 ~-16 = 15</p>
+<h2 id="6、快速求幂"><a href="#6、快速求幂" class="headerlink" title="6、快速求幂"></a>6、快速求幂</h2><p>从ES7开始，我们可以使用幂运算符 ** 作为求幂的简写，相对之前的Math.pow(2, 3) 更加快捷。这是一个很简单实用的点，但是大部分的教程并不会专门介绍它。</p>
+<p>这不应该与 ^ 符号混淆，^ 符号通常用于表示指数，但在JavaScript中是位XOR操作符。</p>
+<p>在ES7之前，幂的简写主要依靠的是位左移位操作符 &lt;&lt;，几种写法的区别。</p>
+<p>其中需要注意的是 2 &lt;&lt; 3 = 16 等价于 2 ** 4 = 16</p>
+<h2 id="7、快速Float转Integer"><a href="#7、快速Float转Integer" class="headerlink" title="7、快速Float转Integer"></a>7、快速Float转Integer</h2><p>我们平时可以使用Math.floor(), Math.ceil()和Math.round()将float类型转换成integer类型。</p>
+<p>但是还有一种更快的方法可以使用|(位或运算符)将浮点数截断为整数。</p>
+<p>| 的行为取决于处理的是正数还是负数，所以最好只在确定的情况下使用这个快捷方式。</p>
+<p>如果n是正数的，则 n | 0 有效地向下舍入。如果n是负数的，它则有效地向上取整。更准确地说，该操作结果是直接删除小数点后的内容，将浮点数截断为整数，和上面提到的其他几个方法是有所区别的。</p>
+<p>您还可以使用 ~~ 来获得相同的舍入效果，如上所述，实际上任何位操作符都会强制浮点数为整数。这些特殊操作之所以有效，是因为一旦强制为整数，值就保持不变。</p>
+<p>使用场景<br>位或运算符可以用于从整数的末尾删除任意数量的数字。这意味着我们不必使用这样的代码在类型之间进行转换。</p>
+<p>而是可以使用下面的方式来实现我们的功能</p>
+<h2 id="8、类中自动绑定"><a href="#8、类中自动绑定" class="headerlink" title="8、类中自动绑定"></a>8、类中自动绑定</h2><p>我们可以在类中通过使用ES6增加的箭头函数的方式来实现隐形绑定作用域。而按照之前的处理，我们需要显式的去为我们写的方法进行绑定，类似于 this.myMethod = this.myMethod.bind(this)这样。当我们的类中有很多方法时，会增加大量的绑定的代码的书写。现在我们就可以通过箭头函数的方式来简化这个过程。</p>
+<h2 id="9、截取数组"><a href="#9、截取数组" class="headerlink" title="9、截取数组"></a>9、截取数组</h2><p>如果您想从数组的末尾删除值，有比使用splice()更快的替代方法。</p>
+<p>例如，如果你知道原始数组的长度，就可以通过重新定义它的length属性来实现截取。</p>
+<p>这是一个特别简洁的解决方案。但是，slice()方法的运行时更快。如果速度是你的主要目标，考虑使用下面的方式。</p>
+<h2 id="10、获取数组中的最后的元素"><a href="#10、获取数组中的最后的元素" class="headerlink" title="10、获取数组中的最后的元素"></a>10、获取数组中的最后的元素</h2><p>数组方法slice()可以接受负整数，如果提供它，它将从数组的末尾开始截取数值，而不是开头。</p>
+<h2 id="11、格式化JSON代码"><a href="#11、格式化JSON代码" class="headerlink" title="11、格式化JSON代码"></a>11、格式化JSON代码</h2><p>我们可能在处理一些JSON相关的处理时很多时候都会使用到JSON.stringify，但是你是否意识到它可以帮助缩进JSON呢？</p>
+<p>stringify()方法接受两个可选参数:一个replacer函数和一个space值，replacer函数可以用来过滤显示的JSON。</p>
+<p>space值接受一个整数，表示需要的空格数或一个字符串(如’\t’来插入制表符)，它可以使读取获取的JSON数据变得容易得多。</p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MjM5NTEwMTAwNg==&amp;mid=2650216146&amp;idx=2&amp;sn=be13f5c2513fbc322b5cadbc17bf4480&amp;chksm=befe16f389899fe5179cee2294e9198794758573a3115809cbcef501f624c84cca1f67828fe1&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=%2BtQBclBSHQnfxSQg7bNJCFcVBdaKR2KUUTRqQ%2BAOykIcmStG96Xgs%2BkaPpXVAxHF#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MjM5NTEwMTAwNg==&amp;mid=2650216146&amp;idx=2&amp;sn=be13f5c2513fbc322b5cadbc17bf4480&amp;chksm=befe16f389899fe5179cee2294e9198794758573a3115809cbcef501f624c84cca1f67828fe1&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=%2BtQBclBSHQnfxSQg7bNJCFcVBdaKR2KUUTRqQ%2BAOykIcmStG96Xgs%2BkaPpXVAxHF#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +95,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="不常被提及的JavaScrip"
 >
   Tweet
 </a>
