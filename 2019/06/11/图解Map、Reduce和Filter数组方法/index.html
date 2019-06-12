@@ -37,7 +37,37 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="图解Map、Reduce和Filter数组方法"><a href="#图解Map、Reduce和Filter数组方法" class="headerlink" title="图解Map、Reduce和Filter数组方法"></a>图解Map、Reduce和Filter数组方法</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>正文从这开始～～</p>
+<p>map、reduce 和 filter 是三个非常实用的 JavaScript 数组方法，赋予了开发者四两拨千斤的能力。我们直接进入正题，看看如何使用（并记住）这些超级好用的方法！</p>
+<h2 id="Array-map"><a href="#Array-map" class="headerlink" title="Array.map()"></a>Array.map()</h2><p>Array.map() 根据传递的转换函数，更新给定数组中的每个值，并返回一个相同长度的新数组。它接受一个回调函数作为参数，用以执行转换过程。</p>
+<blockquote>
+<p>一个帮助记住 map 的方法：Morph Array Piece-by-Piece（逐个改变数组）</p>
+</blockquote>
+<p>你可以使用 map 代替 for-each 循环，来遍历并对每个值应用转换函数。这个方法适用于当你想更新数组的同时保留原始值。它不会潜在地删除任何值（filter 方法会），也不会计算出一个新的输出（就像 reduce 那样）。map 允许你逐个改变数组。一起来看一个例子：</p>
+<p>上面的例子中，我们使用一个初始数组（[1, 4, 6, 14, 32, 78]），映射每个值到它自己的十倍（val * 10）。结果是一个新数组，初始数组的每个值被这个等式转换：[10, 40, 60, 140, 320, 780]。</p>
+<h2 id="Array-filter"><a href="#Array-filter" class="headerlink" title="Array.filter()"></a>Array.filter()</h2><p>当我们想要过滤数组的值到另一个数组，新数组中的每个值都通过一个特定检查，Array.filter() 这个快捷实用的方法就派上用场了。</p>
+<p>类似搜索过滤器，filter 基于传递的参数来过滤出值。</p>
+<p>举个例子，假定有个数字数组，想要过滤出大于 10 的值，可以这样写：</p>
+<p>但是 filter 方法，只返回真值。因此如果所有值都执行指定的检查的话，结果的长度会小于等于原始数组。</p>
+<blockquote>
+<p>把 filter 想象成一个漏斗。部分混合物会从中穿过进入结果，而另一部分则会被留下并抛弃。</p>
+</blockquote>
+<p>假设宠物训练学校有一个四只狗的小班，学校里的所有狗都会经过各种挑战，然后参加一个分级期末考试。我们用一个对象数组来表示这些狗狗：</p>
+<p>如果狗狗们的期末考试成绩高于 70 分，它们会获得一个精美的证书；反之，它们就要去重修。为了知道证书打印的数量，要写一个方法来返回通过考试的狗狗。不必写循环来遍历数组的每个对象，我们可以用 filter 简化代码！</p>
+<p>你也看到了，Boops 和 Taco 是好狗狗（其实所有狗都很不错），它们取得了通过课程的成就证书！利用箭头函数的隐式返回特性，一行代码就能实现。因为只有一个参数，所以可以删掉箭头函数的括号：</p>
+<h2 id="Array-reduce"><a href="#Array-reduce" class="headerlink" title="Array.reduce()"></a>Array.reduce()</h2><p>reduce() 方法接受一个数组作为输入值并返回一个值。这点挺有趣的。reduce 接受一个回调函数，回调函数参数包括一个累计器（数组每一段的累加值，它会像雪球一样增长），当前值，和索引。reduce 也接受一个初始值作为第二个参数：</p>
+<p>来写一个炒菜函数和一个作料清单：</p>
+<p>如果我们想要把这些作料做成一个调味汁（开玩笑的），用 reduce() 来归约！</p>
+<p>初始值（这个例子中的 ‘’）很重要，它决定了第一个作料能够进行烹饪。这里输出的结果不太靠谱，自己炒菜时要当心。下面的例子就是我要说到的情况：</p>
+<p>最后，确保新字符串的末尾没有额外的空白，我们可以传递索引和数组来执行转换：</p>
+<p>可以用三目操作符、模板字符串和隐式返回，写的更简洁（一行搞定！）：</p>
+<blockquote>
+<p>记住这个方法的简单办法就是回想你怎么做调味汁：把多个作料归约到单个。</p>
+</blockquote>
+<p>和我一起唱起来！<br>我想要用一首歌来结束这篇博文，给数组方法写了一个小调，来帮助你们记忆：</p>
+<p>视频地址：<a href="https://youtu.be/-YEbBy3Mk" target="_blank" rel="external">https://youtu.be/-YEbBy3Mk</a></p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232068&amp;idx=1&amp;sn=ff2aaa15173d24f5242fe11684597e33&amp;chksm=bd494ec08a3ec7d63d439343efca71f1fcbb8875ff153c9358afc8c2d20a31b008ebebd5a0cf&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=WRC5B29YFNG7tZPLpUQZI0otv8n4hIK5jdRp%2FQi%2BRU8e24qeqD2VsQb%2B6dkgZCWf#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651232068&amp;idx=1&amp;sn=ff2aaa15173d24f5242fe11684597e33&amp;chksm=bd494ec08a3ec7d63d439343efca71f1fcbb8875ff153c9358afc8c2d20a31b008ebebd5a0cf&amp;mpshare=1&amp;scene=1&amp;srcid=&amp;pass_ticket=WRC5B29YFNG7tZPLpUQZI0otv8n4hIK5jdRp%2FQi%2BRU8e24qeqD2VsQb%2B6dkgZCWf#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +86,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="图解Map、Reduce和Fi"
 >
   Tweet
 </a>

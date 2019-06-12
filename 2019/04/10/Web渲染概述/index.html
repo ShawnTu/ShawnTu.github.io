@@ -37,7 +37,68 @@
   </section>
 
   <section class="article-entry">
-    
+    <h1 id="Web渲染概述"><a href="#Web渲染概述" class="headerlink" title="Web渲染概述"></a>Web渲染概述</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文简单介绍了web应用各种渲染方案，其中包括客户端渲染、服务器端渲染等各种渲染方案。今日早读文章由阿里CBU前端授权分享。</p>
+<p>正文从这开始～～</p>
+<h2 id="起航"><a href="#起航" class="headerlink" title="起航"></a>起航</h2><p>作为开发人员，我们经常面临影响应用程序整个架构的决策。我们必须做出的核心决策之一是在什么地方实现业务逻辑和渲染逻辑。这可能很困难，因为有很多不同的方法来构建网站。对这个领域的理解来自于过去几年我们在一些大型网站的工作。从广义上说，我们鼓励开发人员选用带有rehydration（下一小节有解释）的服务器端渲染或静态化渲染。为了更好理解我们在做决定时所选择的架构，需要对每种方法和术语有充分的理解，通过不同渲染方式的页面性能可以帮助我们理解它们之间的差异。</p>
+<h2 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h2><h3 id="渲染"><a href="#渲染" class="headerlink" title="渲染"></a>渲染</h3><ul>
+<li><p>SSR：服务器端渲染。</p>
+</li>
+<li><p>CSR：客户端渲染。</p>
+</li>
+<li><p>Rehydration：在服务器端渲染的dom树和数据的基础上，浏览器端利用JavaScript再次渲染。</p>
+</li>
+<li><p>Prerendering：在构建时生成静态HTML和页面的初始状态。</p>
+</li>
+</ul>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><ul>
+<li><p>TTFB：Time to First Byte —— 浏览器发出资源请求到接受到资源第一个字节的时间。</p>
+</li>
+<li><p>FP：First Paint —— 页面打开到可视内容第一个像素渲染出来的时间。</p>
+</li>
+<li><p>FCP：First Contentful Paint —— 页面打开到页面主要内容可见的时间。</p>
+</li>
+<li><p>TTI：Time To Interactive —— 页面打开到变得可以交互的时间。</p>
+</li>
+</ul>
+<h2 id="服务器端渲染"><a href="#服务器端渲染" class="headerlink" title="服务器端渲染"></a>服务器端渲染</h2><p>服务器端渲染：打开页面时服务器将完整的HTML生成好了并返回。这避免了在浏览器端取数然后渲染所产生的消耗，因为这些事情已经在服务器端响应用户之前就已经做好了。</p>
+<p>服务器端渲染会带来快速的FP和FCP，在服务器端处理业务逻辑和渲染逻辑，可以避免向浏览器发送大量JavaScript，这有助于实现快速的TTI，这种方法适用于各种设备和网络环境，如果你开启了一些流浏览器优化，比如文档采用流的方式解析（streaming document parsing）。</p>
+<p>对于服务器端渲染，用户不太可能会去等浏览器执行其他的耗CPU的JavaScript代码执行完毕再去操作，因为页面内容已经显示出来了。在第三方js无法避免时（广告），虽然服务器端渲染可以减少FP和FCP渲染的JavaScript消耗，但是可能会给接下来要执行的js带来一定的“负担”。服务器端渲染的主要缺点在于，渲染需要消耗时间，所以可能TTFB会比较大。</p>
+<p>服务器渲染是否可以满足应用程序，很大程度上取决于您正在构建的体验类型。关于服务器渲染与客户端渲染的哪个更好的争论从未停过。但是我们需要记住的时，我们可以有选择让一些页面进行服务器端渲染，其他页面使用客户端渲染。一些网站使用这种混合渲染模式就取得了不错的效果，比如Netflix对他的登录页面采用了服务器端渲染，同时为重交互的页面预取js，为那些重交互并且客户端渲染的页面加快页面加载的机会。</p>
+<p>许多现代框架、库和架构使得同一个应用同时在服务器端和浏览器端都能渲染成为可能。这些技术虽然可以用于服务器端渲染，但需要注意的是，在服务器和客户端上进行渲染的体系结构具有非常不同的性能特征和权衡。React用户可以用它的renderToString方法或者其他基于该方法的框架进行服务器端渲染，比如Next.js; Vue用户可以去看它的服务器端渲染指南或者Nuxt; Angular用户可以去看Universal。</p>
+<h2 id="静态化渲染"><a href="#静态化渲染" class="headerlink" title="静态化渲染"></a>静态化渲染</h2><p>静态化渲染：在构建（build）时将页面中不会变化的内容直接渲染成出来，然后打到HTML中去。在浏览器端需要执行的js有限的假设下，该方法能够提供快速的FP、FCP和TTI。与服务器端渲染不同，它还能提供快速的TTFB，因为服务器端不需要生成HTML。一般而言，静态化渲染需要为每个URL生成一个单独的HTML，当用户访问的时候，直接将预先渲染好的HTML返回就好。另外渲染出的HTML也可以部署到CDN上，通过edge caching（边缘缓存）缓存做一些优化。对于不了解edge caching的同学，可以去看一下我们之前写的React缓存小记，里面有关于它的介绍。</p>
+<p>静态化渲染也有不同的方案，比如像Gatsby这样的工具旨在让开发人员感觉他们的应用程序是动态渲染的，而不是在构建过程中产生静态的HTML；像Jekyl和Metalsmith这样的工具拥抱的静态特性，提供了很多模板驱动的方法。</p>
+<p>静态化渲染需要为每个URL生成单独的HTML，这是它的一个缺点。如果您无法提前预测这些URL的内容，或者或一个网站存在大量的URL，静态化渲染可能是不合适的。对于静态化渲染，React用户可能对Gatsby、Next.js的static export或者Navi比较熟悉。</p>
+<p>这里我们需要重点理解一下静态化渲染和预渲染之间的差异：静态化渲染的页面在浏览器端变得能够交互之前只需要执行很少的js代码，甚至不需要；而预渲染虽然能够实现快速的FP、FCP，但应用必须在浏览器端执行js代码才能变得可交互。</p>
+<p>如果您不能确定到底是使用静态化渲染还是预渲染，那就测试一下呗，在应用加载的时候，禁止JavaScript的加载和执行。禁止JavaScript后，对于静态化渲染，页面的大多数功能还是能够正常运行；而对于预渲染，页面可能只有一些基础的功能能够工作，比如连接跳转。</p>
+<p>另一个有用的测试方式是通过Chrome的开发者工具DevTools减慢网络速度，观察在页面变为交互之前下载了多少JavaScript。预渲染通常需要更多的JavaScript，并且复杂度往往也比使用渐进增强的静态化渲染要高。</p>
+<h2 id="服务器端渲染VS静态化渲染"><a href="#服务器端渲染VS静态化渲染" class="headerlink" title="服务器端渲染VS静态化渲染"></a>服务器端渲染VS静态化渲染</h2><p>服务器端渲染不是一颗银弹，它的动态特性会带来巨大的计算开销。服务器端渲染会加大TTFB或发送双倍的数据（比如将客户端的State数据打到HTML中去），在React中，renderToString会很慢，因为它是同步并且单线程的。为了让服务器端渲染能够”正确“运行，我们需要关注组件缓存、内存消耗、memoization技术应用和其他问题。通常情况你可能需要多次渲染同一个应用——一次在服务器端，一次在客户端。服务器端渲染只能让需要展示的内容显示的的更快，并没有减少工作量。</p>
+<p>服务器端渲染可以根据不同的URL生成不同的内容，相较于静态化渲染，它的速度可能会慢一些。其实我们可以做一些工作来缓解这个问题，服务器渲染 + HTML缓存可以大大减少渲染时间。服务器端渲染的优势在于它能够获取实时数据，并且所能处理的请求集比静态化渲染要大。因为静态化渲染只能处理那些提前能够预测内容的页面，对于需要个性化的页面（千人千面），静态化渲染就无法处理了。</p>
+<p>在构建PWA时，服务器端渲染也有用武之地，服务器端对页面片段进行渲染，前端使用Service Worker进行缓存。</p>
+<h2 id="客户端渲染"><a href="#客户端渲染" class="headerlink" title="客户端渲染"></a>客户端渲染</h2><p>客户端渲染：是指在浏览器中直接使用JavaScript来渲染页面，所有的逻辑、数据的获取、模板和路由都是在客户端而不是服务器上处理的。</p>
+<p>在移动端，客户端渲染很难获得并保持一个较快的渲染速度。有时我们只需要做很少的工作，就能让客户端渲染的性能与服务器端渲染的性能相差无几，比如尽可能的保持小的JS体积和少的RTT（<a href="https://en.wikipedia.org/wiki/Round-trip_delay_time）。甚至关键的脚本和数据如果使用HTTP/2的服务器端推送，或者使用" target="_blank" rel="external">https://en.wikipedia.org/wiki/Round-trip_delay_time）。甚至关键的脚本和数据如果使用HTTP/2的服务器端推送，或者使用</a><link rel="preload">，我们还可以让解析工作更早开始。另外，像PRPL这样的技术也可以帮助我们加快页面的初始化及其后续导航。</p>
+<p>但事情并不是这么简单。客户端渲染的主要问题是，所需的JavaScript会随着应用程序的增长而增长。随着新的JavaScript库、兼容组件和第三方代码的添加，控制脚本的规模会变得格外困难——尤其是这些代码和库都经常都需要在页面内容渲染之前被加载。所以对于那些脚本规模很大的应用，应该优先考虑使用代码拆分的方案。特别的，对于懒加载的JavaScript，要确保只在有需要时才加载必要的代码。而对于只有很少或者没有什么交互的应用，服务器渲染是一个可扩展性更好的方案。</p>
+<p>如果你想构建SPA（单页）应用，使用app shell缓存页面中交互的核心组件会给你很大的帮助。如果结合PWA的Service Work技术，还可以有效提高页面重复访问时的性能。</p>
+<h2 id="通过rehydration将服务器渲染和客户端渲染相结合"><a href="#通过rehydration将服务器渲染和客户端渲染相结合" class="headerlink" title="通过rehydration将服务器渲染和客户端渲染相结合"></a>通过rehydration将服务器渲染和客户端渲染相结合</h2><p>通常称为同构渲染或者直接简单地称为”SSR”，这种方式尝试在客户端渲染和服务端渲染之间寻找平衡，希望能够减少两者的弊端。</p>
+<p>页面导航导致跳转或刷新时，服务器会输出页面的HTML文档，并把该页面所需要的javascript和（用于渲染的）数据内联到文档一起输出。如果实现得当，这种方式确实可以像服务端渲染那样实现较快的首次内容绘制（First Contentful Paint），之后客户端会通过一种叫rehydration的技术继续（在客户端）渲染。这是个新颖的技术，但它会引起比较大的性能问题。</p>
+<p>使用reydration技术进行服务端渲染的主要问题在于它会对可交互时间（Time To Interactive）有明显的负面影响，尽管它缩短了首次绘制时间（First Paint）。服务端渲染的页面往往让人感觉已经加载完毕并可以开始交互了，但实际上只有等到客户端的js脚本执行并完成DOM事件绑定才能响应用户的交互（例如用户的输入行为）。在一些手机终端，这个过程会耗费几秒甚至几分钟的时间。</p>
+<p>也许你自己也经历过这样的场景：一个页面看起来已经加载完成了，但是在页面执行点击或者轻触的动作，结果却什么也没发生。这很快变得令人沮丧……“为什么(页面)没有反应？为什么我不能滚动？”</p>
+<h3 id="Rehydration问题：重复"><a href="#Rehydration问题：重复" class="headerlink" title="Rehydration问题：重复"></a>Rehydration问题：重复</h3><p>Rehydration的问题不止于此，通常比因js导致的交互延迟更糟糕。为了让客户端js能够准确地渲染，而不用重新向服务器请求渲染所需的数据，目前服务端渲染通常会把UI所需的数据序列化并内联到HTML文档的script标签里。最终的HTML文档包含了更高层面的重复:</p>
+<p>可以看到，对于页面导航请求，服务器会返回了相应的UI描述（HTML），但它同样返回了渲染UI所需的数据。同时，客户端脚本同样包括了UI的描述（译者注：前端渲染需要包含对UI的描述，例如JSX），以便在客户端继续渲染。只有当bundle.js完成下载和执行后，UI才进入可交互状态。</p>
+<p>从使用rehydration方案的一些真实网站搜集到的性能数据来看，该方案是极度不推荐的。究其原因，还是回到用户体验上：这种方式很容易让用户停留在“神秘的峡谷”之中。（译者注：即界面可见但不可交互的状态）</p>
+<p>尽管如此，外界对rehydration方案还是有些许期待的。简单来说，使用服务端渲染时，只对需要高度缓存的内容才会降低首字节时间（TTFB），得到和预渲染（prerendering）类似的结果。</p>
+<p>在未来，rehydtration方案可能会逐渐地、或者部分地被应用，并成为服务端渲染的关键。</p>
+<h2 id="流式服务端渲染和渐进式Rehydration"><a href="#流式服务端渲染和渐进式Rehydration" class="headerlink" title="流式服务端渲染和渐进式Rehydration"></a>流式服务端渲染和渐进式Rehydration</h2><p>服务端渲染在过去几年中有了长足的进展。</p>
+<p>流式服务端渲染允许你以块的形式发送HTML，同时浏览器端接收并逐一渲染，这种方案可以实现快速的FP和FCP。React提供了一个异步的、以流的方式传输的方式 renderToNodeStream，与同步的renderToString相比，它能够更好处理服务器压力。</p>
+<p>渐进式Rehydration也值得关注，React团队正在做一些有趣的探索（<a href="https://github.com/facebook/react/pull/14717）。使用这种方法，服务器渲染随着时间的推移被“启动”去渲染应用的各个片段，而不是当前一次性渲染整个应用。这可以帮助减少使页面交互所需的JavaScript，因为这样可以延迟页面中低优先级展示内容的渲染（比如非首屏的内容），同时可以防止这些低优先级的渲染阻塞主线程。而且，这种方案也能避免带Rehydration的服务端渲染的一个很大的陷阱：服务端渲染生成的DOM树在浏览器端被销毁然后被重建，这个问题大多数是因为同步的客户端渲染生成DOM树所需要的初始数据还没准备好。" target="_blank" rel="external">https://github.com/facebook/react/pull/14717）。使用这种方法，服务器渲染随着时间的推移被“启动”去渲染应用的各个片段，而不是当前一次性渲染整个应用。这可以帮助减少使页面交互所需的JavaScript，因为这样可以延迟页面中低优先级展示内容的渲染（比如非首屏的内容），同时可以防止这些低优先级的渲染阻塞主线程。而且，这种方案也能避免带Rehydration的服务端渲染的一个很大的陷阱：服务端渲染生成的DOM树在浏览器端被销毁然后被重建，这个问题大多数是因为同步的客户端渲染生成DOM树所需要的初始数据还没准备好。</a></p>
+<h3 id="局部Rehydration"><a href="#局部Rehydration" class="headerlink" title="局部Rehydration"></a>局部Rehydration</h3><p>局部rehydration被证明难以实现。这个方案是渐进式Rehydration的一个扩展，需要分析出相互独立的片段（组件/视图/树）中哪些具有极少交互或者完全没有交互的部分进行渐进式rehydrated。对于这些近乎静态的部分，相应JavaScript代码会被改造成惰性的引用，从而将它们对客户端的影响降低到近乎为0。局部hydration为缓存带来了一定挑战，客户端导航意味着我们不能假设应用程序的惰性部分即服务器渲染生成的HTML是可用的，除非页面完全加载完。</p>
+<h3 id="Trisomorphic渲染"><a href="#Trisomorphic渲染" class="headerlink" title="Trisomorphic渲染"></a>Trisomorphic渲染</h3><p>如果Service Worker是你的一个选项，“trisomorphic”渲染也是一个有趣的点子。利用这项技术，你可以利用流式服务端渲染生成初始的或不依赖JS的部分，然后在Service Worker install后利用它渲染生成html。这种方案能使缓存的组件和模板保持实时而且还支持SPA类型的应用，在同一会话中根据不同的导航渲染不同的视图。这种方法在服务器端、客户端和Service Worker中可以复用模板和路由代码。</p>
+<h3 id="SEO"><a href="#SEO" class="headerlink" title="SEO"></a>SEO</h3><p>在选择在渲染方案，通常会考虑SEO。通常我们会选择服务器渲染来应对爬虫。爬虫可能能理解JavaScript，但是它们有很多局限性，我们需要重点关注一下他们是如何渲染的。虽然客户端渲染可以工作，但是一般都没有做测试等工作，如果您的应用依赖于客户端渲染，动态渲染是您值得考虑的一个选项，具体可以参考<a href="https://developers.google.com/search/docs/guides/dynamic-rendering。" target="_blank" rel="external">https://developers.google.com/search/docs/guides/dynamic-rendering。</a></p>
+<p>如果有疑问，Mobile Friendly Test可以测试您选择的方法是否符合预期，它可以显示页面在爬虫中的显示方式、序列化的HTML内容（JavaScript执行之后）以及渲染过程中出现的任何错误。</p>
+<p>Mobile Friendly Test地址如下：</p>
+<p><a href="https://search.google.com/test/mobile-friendly" target="_blank" rel="external">https://search.google.com/test/mobile-friendly</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>当决定用什么方式渲染的时候，要知道我们即将遇到的瓶颈是什么。采用客户端渲染还是服务端渲染将决定你90%的架构设计。一个完美的解决方案通常服务端发送html跟最小的js来完成交互。以下是服务端-客户端渲染的一个总结图：</p>
+<p>原帖来源：<a href="https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651231728&amp;idx=2&amp;sn=23f819f66e94b9e052c0da9be157a729&amp;chksm=bd494c748a3ec56288981259b1b48462c3afd982c3ea79a175396336d89a92856b8f2f74acd4&amp;mpshare=1&amp;scene=1&amp;srcid=0612K8jbPFKZx9K6Y8sMLZPo&amp;pass_ticket=WRC5B29YFNG7tZPLpUQZI0otv8n4hIK5jdRp%2FQi%2BRU8e24qeqD2VsQb%2B6dkgZCWf#rd" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MjM5MTA1MjAxMQ==&amp;mid=2651231728&amp;idx=2&amp;sn=23f819f66e94b9e052c0da9be157a729&amp;chksm=bd494c748a3ec56288981259b1b48462c3afd982c3ea79a175396336d89a92856b8f2f74acd4&amp;mpshare=1&amp;scene=1&amp;srcid=0612K8jbPFKZx9K6Y8sMLZPo&amp;pass_ticket=WRC5B29YFNG7tZPLpUQZI0otv8n4hIK5jdRp%2FQi%2BRU8e24qeqD2VsQb%2B6dkgZCWf#rd</a></p>
+
   </section>
 </article>
 
@@ -56,7 +117,7 @@
   class="twitter-share-button"
   data-size="large"
   data-via="DrakeLeung"
-  href="https://twitter.com/intent/tweet?text="
+  href="https://twitter.com/intent/tweet?text= id="Web渲染概述"><a hre"
 >
   Tweet
 </a>
